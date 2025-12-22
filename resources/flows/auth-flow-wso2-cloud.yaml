@@ -1,6 +1,6 @@
 id: "019b34c3-eed4-7a63-be15-90dc8e80f675"
 handle: "default-basic-flow"
-name: "Basic Authentication Flow - New"
+name: "Basic Authentication Flow"
 flowType: "AUTHENTICATION"
 activeVersion: 2
 nodes:

@@ -3,7 +3,7 @@ name: "App Native application"
 description: "Developer application for Thunder"
 url: "https://localhost:8090/develop"
 logo_url: "https://localhost:8090/develop/assets/images/trifacta.svg"
-auth_flow_graph_id: "019b4738-6d31-7f9e-9562-5febcd0a3112"
+auth_flow_graph_id: "019b4736-e6cd-74c0-99af-68201730010d"
 registration_flow_graph_id: "019b4542-4d4f-7280-bb7c-cf31470ccdff"
 is_registration_flow_enabled: false
 certificate:

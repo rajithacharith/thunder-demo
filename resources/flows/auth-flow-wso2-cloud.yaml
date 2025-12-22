@@ -1,37 +1,44 @@
-id: "019b34c3-eed4-7a63-be15-90dc8e80f675"
-handle: "default-basic-flow"
-name: "Basic Authentication Flow"
-flowType: "AUTHENTICATION"
-activeVersion: 2
+# File: Develop_App_Authentication_Flow.yaml
+id: 019b34c3-eed4-7a63-be15-90dc8e80f675
+handle: develop-app-flow
+name: Develop App Authentication Flow
+flowType: AUTHENTICATION
+activeVersion: 4
 nodes:
-  - id: "start"
-    type: "START"
-    onSuccess: "basic_auth"
-  - id: "basic_auth"
-    type: "TASK_EXECUTION"
+  - id: start
+    type: START
+    onSuccess: prompt_credentials
+  - id: prompt_credentials
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
     inputs:
-      - ref: "input_001"
-        type: "TEXT_INPUT"
-        identifier: "username"
+      - ref: input_001
+        type: TEXT_INPUT
+        identifier: username
         required: true
-      - ref: "input_002"
-        type: "PASSWORD_INPUT"
-        identifier: "password"
+      - ref: input_002
+        type: PASSWORD_INPUT
+        identifier: password
         required: true
+    actions:
+      - ref: action_001
+        nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
     executor:
-      name: "BasicAuthExecutor"
-    onSuccess: "authorization_check"
-  - id: "authorization_check"
-    type: "TASK_EXECUTION"
+      name: BasicAuthExecutor
+    onSuccess: authorization_check
+  - id: authorization_check
+    type: TASK_EXECUTION
     executor:
-      name: "AuthorizationExecutor"
-    onSuccess: "auth_assert"
-  - id: "auth_assert"
-    type: "TASK_EXECUTION"
+      name: AuthorizationExecutor
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
     executor:
-      name: "AuthAssertExecutor"
-    onSuccess: "end"
-  - id: "end"
-    type: "END"
-createdAt: "2025-12-19T04:00:14Z"
-updatedAt: "2025-12-19T04:04:30Z"
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2025-12-22 08:52:12
+updatedAt: 2025-12-22 16:45:46

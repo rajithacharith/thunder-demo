@@ -21,9 +21,7 @@
 # It uses the existing Thunder Docker image as a base and adds Choreo-specific configurations
 
 # Use the existing Thunder image as base
-# You can specify the version tag as needed (e.g., v0.15.0, latest)
-ARG THUNDER_VERSION=latest
-FROM ghcr.io/asgardeo/thunder:${THUNDER_VERSION}
+FROM ghcr.io/rajithacharith/thunder:0.16.0
 
 # Switch to root for configuration changes
 USER root

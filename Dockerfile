@@ -46,70 +46,8 @@ ENV SERVER_HOST="0.0.0.0" \
     LOG_LEVEL="INFO" \
     DATABASE_TYPE="sqlite"
 
-# Create a startup script for Choreo that handles dynamic configuration
-RUN cat > /opt/thunder/choreo-start.sh << 'EOF'
-#!/bin/bash
-set -e
-
-echo "🚀 Starting Thunder on Choreo Platform..."
-
-# Update deployment.yaml with environment variables if provided
-DEPLOYMENT_CONFIG="/opt/thunder/repository/conf/deployment.yaml"
-
-# Ensure database directories exist for SQLite
-if [ "$DATABASE_TYPE" = "sqlite" ]; then
-    mkdir -p /opt/thunder/repository/database
-    echo "📁 SQLite database directory ready"
-fi
-
-# Update server hostname if provided
-if [ -n "$SERVER_HOST" ] && [ -f "$DEPLOYMENT_CONFIG" ]; then
-    echo "📝 Updating server hostname to: $SERVER_HOST"
-    sed -i "s/hostname: \".*\"/hostname: \"${SERVER_HOST}\"/" "$DEPLOYMENT_CONFIG"
-fi
-
-# Update server port if provided
-if [ -n "$SERVER_PORT" ] && [ -f "$DEPLOYMENT_CONFIG" ]; then
-    echo "📝 Updating server port to: $SERVER_PORT"
-    sed -i "s/port: [0-9]*/port: ${SERVER_PORT}/" "$DEPLOYMENT_CONFIG"
-fi
-
-# Update CORS allowed origins if provided
-if [ -n "$CORS_ALLOWED_ORIGINS" ] && [ -f "$DEPLOYMENT_CONFIG" ]; then
-    echo "📝 Updating CORS allowed origins"
-    # This is a simplified update - you may need more sophisticated YAML editing
-    # for complex CORS configurations
-fi
-
-# Update public URL if provided
-if [ -n "$PUBLIC_URL" ]; then
-    echo "📝 Setting public URL to: $PUBLIC_URL"
-    if grep -q "public_url:" "$DEPLOYMENT_CONFIG"; then
-        sed -i "s|public_url: \".*\"|public_url: \"${PUBLIC_URL}\"|" "$DEPLOYMENT_CONFIG"
-    else
-        sed -i "/hostname: \"${SERVER_HOST}\"/a\  public_url: \"${PUBLIC_URL}\"" "$DEPLOYMENT_CONFIG"
-    fi
-fi
-
-# Log configuration status
-echo "🔧 Configuration applied:"
-echo "   - Server Host: ${SERVER_HOST}"
-echo "   - Server Port: ${SERVER_PORT}"
-echo "   - Database Type: ${DATABASE_TYPE}"
-echo "   - Public URL: ${PUBLIC_URL:-<using config file>}"
-
-# Start Thunder server
-echo "⚡ Starting Thunder server..."
-exec ./start.sh
-EOF
-
-# Make the startup script executable
-RUN chmod +x /opt/thunder/choreo-start.sh
-
-# Health check for Choreo platform
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -k -f https://localhost:${SERVER_PORT}/health || exit 1
-
+# Add thunder user with UID 10001 if not already present
+RUN adduser -u 10001 -D thunder
 # Switch back to thunder user for security
 RUN chown -R thunder:thunder /opt/thunder
 USER thunder
@@ -118,4 +56,4 @@ USER thunder
 EXPOSE 8090
 
 # Use the Choreo startup script
-CMD ["/opt/thunder/choreo-start.sh"]
+CMD ["/opt/thunder/start.sh"]

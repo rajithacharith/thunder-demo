@@ -18,7 +18,8 @@ inbound_auth_config:
         - "https://localhost:5190/gate/signin"
         - "https://localhost:8090/develop"
         - "https://localhost:8090/gate/signin"
-        - "https://localhost:3001"
+        - "https://localhost:3000"
+        - "https://ecd74153-b624-4c46-90c2-aa5c96628cd4.e1-us-east-azure.choreoapps.dev"
       grant_types:
         - "authorization_code"
       response_types:
@@ -59,4 +60,4 @@ inbound_auth_config:
             group:
               - "groups"
 allowed_user_types:
-  - "{{ .ALLOWED_USER_TYPE }}"
+  - "Customer"

@@ -96,6 +96,11 @@ class ChoreoAPIClient:
             'User-Agent': 'Thunder File Mount Sync'
         })
     
+    @staticmethod
+    def get_id(obj: Dict) -> Optional[str]:
+        """Get ID from object, handling both 'id' and 'ID' keys"""
+        return obj.get('id') or obj.get('ID')
+    
     def _get_query_params(self) -> Dict[str, str]:
         """Get common query parameters"""
         return {
@@ -190,7 +195,13 @@ class ChoreoAPIClient:
         
         response_data = response.json()
         logger.debug(f"Response data: {json.dumps(response_data, indent=2)}")
-        configmap_id = response_data.get('data', {}).get('id')
+        data_obj = response_data.get('data', {})
+        configmap_id = self.get_id(data_obj) if data_obj else None
+        
+        if not configmap_id:
+            logger.error(f"Created ConfigMap but no ID returned. Response: {response_data}")
+            raise ValueError(f"Failed to get ConfigMap ID from create response")
+        
         print(f"  ✓ Created ConfigMap: {name} (ID: {configmap_id})")
         logger.info(f"Successfully created ConfigMap '{name}' with ID: {configmap_id}")
         return configmap_id
@@ -381,10 +392,11 @@ class FileMountSynchronizer:
         
         # Check if ConfigMap exists
         existing_configmap = configmap_index.get(configmap_name)
+        existing_id = self.client.get_id(existing_configmap) if existing_configmap else None
         
-        if existing_configmap and existing_configmap.get('id'):
+        if existing_configmap and existing_id:
             # Get detailed ConfigMap to compare content
-            configmap_id = existing_configmap['id']
+            configmap_id = existing_id
             logger.info(f"ConfigMap '{configmap_name}' exists (ID: {configmap_id}), checking for content changes...")
             
             try:
@@ -419,7 +431,10 @@ class FileMountSynchronizer:
         # Ensure mounts exist for all containers
         print(f"  🔗 Checking mounts across {len(containers)} container(s)...")
         for container in containers:
-            container_id = container['id']
+            container_id = self.client.get_id(container)
+            if not container_id:
+                logger.warning(f"Container has no ID, skipping: {container}")
+                continue
             container_name = container.get('name', container_id)
             
             # Get existing mounts for this container
@@ -448,7 +463,10 @@ class FileMountSynchronizer:
         # Delete old mounts
         mounts_deleted = 0
         for container in containers:
-            container_id = container['id']
+            container_id = self.client.get_id(container)
+            if not container_id:
+                logger.warning(f"Container has no ID, skipping: {container}")
+                continue
             try:
                 mounts = self.client.get_config_mounts(container_id)
                 
@@ -486,7 +504,7 @@ class FileMountSynchronizer:
             logger.info(f"ConfigMap '{configmap_name}' doesn't exist, skipping deletion")
             return
         
-        configmap_id = configmap.get('id')
+        configmap_id = self.client.get_id(configmap)
         if not configmap_id:
             print(f"  ⚠ ConfigMap '{configmap_name}' has no ID, skipping deletion")
             logger.warning(f"ConfigMap '{configmap_name}' exists but has no 'id' field: {configmap}")
@@ -498,13 +516,16 @@ class FileMountSynchronizer:
         print(f"  ℹ Removing mounts from containers...")
         mounts_deleted = 0
         for container in containers:
-            container_id = container['id']
+            container_id = self.client.get_id(container)
+            if not container_id:
+                logger.warning(f"Container has no ID, skipping: {container}")
+                continue
             try:
                 mounts = self.client.get_config_mounts(container_id)
                 
                 for mount in mounts:
                     if mount.get('mount_path') == mount_path:
-                        mount_id = mount.get('id')
+                        mount_id = self.client.get_id(mount)
                         if mount_id:
                             self.client.delete_config_mount(container_id, mount_id, mount_path)
                             mounts_deleted += 1

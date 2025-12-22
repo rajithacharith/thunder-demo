@@ -58,8 +58,8 @@ nodes:
       - ref: action_001
         nextNode: ou_creation
     condition:
-      key: {{ context.userEligibleForProvisioning }}
-      value: true
+      key: "{{ context.userEligibleForProvisioning }}"
+      value: "true"
       onSkip: publish_login_event
   - id: ou_creation
     type: TASK_EXECUTION
@@ -67,8 +67,8 @@ nodes:
       name: OUExecutor
     onSuccess: publish_ou_creation_event
     condition:
-      key: {{ context.userEligibleForProvisioning }}
-      value: true
+      key: "{{ context.userEligibleForProvisioning }}"
+      value: "true"
       onSkip: publish_login_event
   - id: publish_ou_creation_event
     type: TASK_EXECUTION
@@ -81,18 +81,14 @@ nodes:
     executor:
       name: HTTPRequestExecutor
     onSuccess: provisioning
-    condition:
-      key: {{ context.userEligibleForProvisioning }}
-      value: true
-      onSkip: publish_login_event
   - id: provisioning
     type: TASK_EXECUTION
     executor:
       name: ProvisioningExecutor
     onSuccess: publish_user_creation_event
     condition:
-      key: {{ context.userEligibleForProvisioning }}
-      value: true
+      key: "{{ context.userEligibleForProvisioning }}"
+      value: "true"
       onSkip: publish_login_event
   - id: publish_user_creation_event
     type: TASK_EXECUTION
@@ -106,8 +102,8 @@ nodes:
       name: HTTPRequestExecutor
     onSuccess: publish_login_event
     condition:
-      key: {{ context.userAutoProvisioned }}
-      value: true
+      key: "{{ context.userAutoProvisioned }}"
+      value: "true"
       onSkip: publish_login_event
   - id: publish_login_event
     type: TASK_EXECUTION

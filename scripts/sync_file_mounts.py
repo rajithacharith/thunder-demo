@@ -15,9 +15,20 @@ import json
 import hashlib
 import requests
 import subprocess
+import logging
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from pathlib import Path
+from datetime import datetime
+
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -34,6 +45,7 @@ class ChoreoConfig:
     @classmethod
     def from_env(cls):
         """Load configuration from environment variables"""
+        logger.info("Loading configuration from environment variables...")
         required_vars = [
             'BASE_URL', 'ACCESS_TOKEN', 'ORG_UUID', 
             'PROJECT_ID', 'COMPONENT_ID', 'ENV_ID', 'APP_ENV_ID'
@@ -41,9 +53,10 @@ class ChoreoConfig:
         
         missing = [var for var in required_vars if not os.getenv(var)]
         if missing:
+            logger.error(f"Missing required environment variables: {', '.join(missing)}")
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
         
-        return cls(
+        config = cls(
             base_url=os.getenv('BASE_URL'),
             access_token=os.getenv('ACCESS_TOKEN'),
             org_uuid=os.getenv('ORG_UUID'),
@@ -52,6 +65,10 @@ class ChoreoConfig:
             env_id=os.getenv('ENV_ID'),
             app_env_id=os.getenv('APP_ENV_ID')
         )
+        logger.info(f"Configuration loaded successfully - Base URL: {config.base_url}")
+        logger.info(f"Organization: {config.org_uuid}, Project: {config.project_id}")
+        logger.info(f"Component: {config.component_id}, Environment: {config.env_id}")
+        return config
 
 
 @dataclass
@@ -89,44 +106,62 @@ class ChoreoAPIClient:
     def get_release_containers(self) -> List[Dict]:
         """Get all containers for the release"""
         url = f"{self.config.base_url}/api/v1/components/{self.config.component_id}/release/{self.config.app_env_id}"
+        logger.info(f"GET {url}")
+        logger.debug(f"Query params: {self._get_query_params()}")
         
         response = self.session.get(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
         
         data = response.json()
+        logger.debug(f"Response data: {json.dumps(data, indent=2)}")
         containers = data.get('data', {}).get('containers', [])
         print(f"✓ Found {len(containers)} container(s)")
+        logger.info(f"Retrieved {len(containers)} container(s): {[c.get('name', c.get('id')) for c in containers]}")
         return containers
     
     def get_configmaps(self) -> List[Dict]:
         """Get all ConfigMaps for the environment"""
         url = f"{self.config.base_url}/api/v1/environments/{self.config.env_id}/configmap"
+        logger.info(f"GET {url}")
         
         response = self.session.get(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
         
         data = response.json()
+        logger.debug(f"Response data: {json.dumps(data, indent=2)}")
         configmaps = data.get('data', [])
         print(f"✓ Found {len(configmaps)} existing ConfigMap(s)")
+        logger.info(f"Retrieved {len(configmaps)} ConfigMap(s): {[cm.get('name') for cm in configmaps]}")
         return configmaps
     
     def get_configmap_details(self, configmap_id: str) -> Dict:
         """Get detailed information about a ConfigMap including content"""
         url = f"{self.config.base_url}/api/v1/environments/{self.config.env_id}/configmap/{configmap_id}"
+        logger.info(f"GET {url}")
         
         response = self.session.get(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
         
-        return response.json().get('data', {})
+        data = response.json().get('data', {})
+        logger.debug(f"ConfigMap details for {configmap_id}: {json.dumps(data, indent=2)}")
+        return data
     
     def get_config_mounts(self, container_id: str) -> List[Dict]:
         """Get all config mounts for a container"""
         url = f"{self.config.base_url}/api/v1/components/{self.config.component_id}/release/{self.config.app_env_id}/container/{container_id}/config-mount"
+        logger.info(f"GET {url}")
         
         response = self.session.get(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
         
-        return response.json().get('data', [])
+        mounts = response.json().get('data', [])
+        logger.debug(f"Mounts for container {container_id}: {json.dumps(mounts, indent=2)}")
+        logger.info(f"Retrieved {len(mounts)} mount(s) for container {container_id}")
+        return mounts
     
     def create_configmap(self, name: str, file_content: str) -> str:
         """Create a new ConfigMap"""
@@ -146,11 +181,18 @@ class ChoreoAPIClient:
             'isBase64': False
         }
         
+        logger.info(f"POST {url}")
+        logger.debug(f"Payload: {json.dumps({**payload, 'data': {'data': f'<{len(file_content)} bytes>'}}, indent=2)}")
+        
         response = self.session.post(url, params=self._get_query_params(), json=payload)
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
         
-        configmap_id = response.json().get('data', {}).get('id')
+        response_data = response.json()
+        logger.debug(f"Response data: {json.dumps(response_data, indent=2)}")
+        configmap_id = response_data.get('data', {}).get('id')
         print(f"  ✓ Created ConfigMap: {name} (ID: {configmap_id})")
+        logger.info(f"Successfully created ConfigMap '{name}' with ID: {configmap_id}")
         return configmap_id
     
     def update_configmap(self, configmap_id: str, name: str, file_content: str) -> None:
@@ -171,17 +213,30 @@ class ChoreoAPIClient:
             'isBase64': False
         }
         
+        logger.info(f"PUT {url}")
+        logger.debug(f"Payload: {json.dumps({**payload, 'data': {'data': f'<{len(file_content)} bytes>'}}, indent=2)}")
+        
         response = self.session.put(url, params=self._get_query_params(), json=payload)
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
+        
+        response_data = response.json()
+        logger.debug(f"Response data: {json.dumps(response_data, indent=2)}")
         print(f"  ✓ Updated ConfigMap: {name} (ID: {configmap_id})")
+        logger.info(f"Successfully updated ConfigMap '{name}' (ID: {configmap_id})")
     
     def delete_configmap(self, configmap_id: str, name: str) -> None:
         """Delete a ConfigMap"""
         url = f"{self.config.base_url}/api/v1/environments/{self.config.env_id}/configmap/{configmap_id}"
         
+        logger.info(f"DELETE {url}")
+        
         response = self.session.delete(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
+        
         print(f"  ✓ Deleted ConfigMap: {name} (ID: {configmap_id})")
+        logger.info(f"Successfully deleted ConfigMap '{name}' (ID: {configmap_id})")
     
     def create_config_mount(self, container_id: str, configmap_id: str, mount_path: str) -> None:
         """Create a config mount for a container"""
@@ -199,17 +254,30 @@ class ChoreoAPIClient:
             'secret_id': None
         }
         
+        logger.info(f"POST {url}")
+        logger.debug(f"Payload: {json.dumps(payload, indent=2)}")
+        
         response = self.session.post(url, params=self._get_query_params(), json=payload)
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
+        
+        response_data = response.json()
+        logger.debug(f"Response data: {json.dumps(response_data, indent=2)}")
         print(f"    ✓ Created mount: {mount_path}")
+        logger.info(f"Successfully created mount at '{mount_path}' for container {container_id}")
     
     def delete_config_mount(self, container_id: str, mount_id: str, mount_path: str) -> None:
         """Delete a config mount"""
         url = f"{self.config.base_url}/api/v1/components/{self.config.component_id}/release/{self.config.app_env_id}/container/{container_id}/config-mount/{mount_id}"
         
+        logger.info(f"DELETE {url}")
+        
         response = self.session.delete(url, params=self._get_query_params())
+        logger.info(f"Response status: {response.status_code}")
         response.raise_for_status()
+        
         print(f"    ✓ Deleted mount: {mount_path}")
+        logger.info(f"Successfully deleted mount '{mount_path}' (ID: {mount_id}) from container {container_id}")
 
 
 class FileMountSynchronizer:
@@ -225,6 +293,7 @@ class FileMountSynchronizer:
     def get_file_changes(self, base_ref: str = "HEAD^") -> List[FileChange]:
         """Get list of changed files using git diff"""
         try:
+            logger.info(f"Detecting file changes: comparing {base_ref} with HEAD")
             # Get changed files compared to previous commit
             result = subprocess.run(
                 ['git', 'diff', '--name-status', '--diff-filter=AMDRT', base_ref, 'HEAD', 'resources/'],
@@ -233,6 +302,7 @@ class FileMountSynchronizer:
                 text=True,
                 check=True
             )
+            logger.debug(f"Git diff output: {result.stdout}")
             
             changes = []
             for line in result.stdout.strip().split('\n'):
@@ -267,6 +337,8 @@ class FileMountSynchronizer:
             return changes
         
         except subprocess.CalledProcessError as e:
+            logger.error(f"Error getting file changes: {e}")
+            logger.error(f"Git stderr: {e.stderr}")
             print(f"Error getting file changes: {e}")
             return []
     
@@ -296,6 +368,7 @@ class FileMountSynchronizer:
     def sync_file_addition_or_modification(self, file_path: str, containers: List[Dict], 
                                           configmap_index: Dict[str, Dict]) -> None:
         """Sync a file that was added or modified"""
+        logger.info(f"Starting sync for file: {file_path}")
         configmap_name = self.file_path_to_configmap_name(file_path)
         mount_path = self.file_path_to_mount_path(file_path)
         file_content = self.read_file_content(file_path)
@@ -304,6 +377,7 @@ class FileMountSynchronizer:
         print(f"\n🔄 Processing: {file_path}")
         print(f"  ConfigMap name: {configmap_name}")
         print(f"  Mount path: {mount_path}")
+        logger.info(f"ConfigMap: {configmap_name}, Mount: {mount_path}, Content hash: {content_hash[:16]}...")
         
         # Check if ConfigMap exists
         existing_configmap = configmap_index.get(configmap_name)
@@ -311,18 +385,23 @@ class FileMountSynchronizer:
         if existing_configmap:
             # Get detailed ConfigMap to compare content
             configmap_id = existing_configmap['id']
+            logger.info(f"ConfigMap '{configmap_name}' exists, checking for content changes...")
             details = self.client.get_configmap_details(configmap_id)
             existing_content = details.get('data', {}).get('data', '')
             existing_hash = self.calculate_content_hash(existing_content)
             
+            logger.info(f"Existing hash: {existing_hash[:16]}..., New hash: {content_hash[:16]}...")
             if existing_hash != content_hash:
                 print(f"  ℹ Content changed, updating ConfigMap...")
+                logger.info(f"Content differs, updating ConfigMap '{configmap_name}'")
                 self.client.update_configmap(configmap_id, configmap_name, file_content)
             else:
                 print(f"  ✓ Content unchanged, skipping ConfigMap update")
+                logger.info(f"Content identical, skipping update for '{configmap_name}'")
         else:
             # Create new ConfigMap
             print(f"  ℹ ConfigMap doesn't exist, creating...")
+            logger.info(f"ConfigMap '{configmap_name}' not found, creating new one")
             configmap_id = self.client.create_configmap(configmap_name, file_content)
         
         # Ensure mounts exist for all containers
@@ -399,6 +478,13 @@ class FileMountSynchronizer:
     
     def sync(self, base_ref: str = "HEAD^") -> None:
         """Main synchronization process"""
+        logger.info("="*70)
+        logger.info("Starting Thunder File Mount Synchronization")
+        logger.info(f"Timestamp: {datetime.now().isoformat()}")
+        logger.info(f"Repository root: {self.repo_root}")
+        logger.info(f"Base reference: {base_ref}")
+        logger.info("="*70)
+        
         print("=" * 70)
         print("🚀 Thunder File Mount Synchronization")
         print("=" * 70)
@@ -408,6 +494,7 @@ class FileMountSynchronizer:
         
         if not changes:
             print("\n✓ No changes detected in resources/ directory")
+            logger.info("No changes detected, exiting")
             return
         
         # Fetch current state from Choreo
@@ -425,6 +512,7 @@ class FileMountSynchronizer:
         
         for change in changes:
             try:
+                logger.info(f"Processing change: {change.status} - {change.get_current_path()}")
                 if change.status == 'R':
                     self.sync_file_rename(change.old_path, change.new_path, containers, configmap_index)
                 elif change.status in ['A', 'M']:
@@ -433,11 +521,14 @@ class FileMountSynchronizer:
                     self.sync_file_deletion(change.old_path, containers, configmap_index)
                 
                 success_count += 1
+                logger.info(f"Successfully processed: {change.get_current_path()}")
             
             except Exception as e:
                 error_count += 1
+                logger.error(f"Error processing {change.get_current_path()}: {str(e)}")
                 print(f"\n❌ Error processing {change.get_current_path()}: {str(e)}")
                 import traceback
+                logger.error(traceback.format_exc())
                 traceback.print_exc()
         
         # Print summary
@@ -448,32 +539,54 @@ class FileMountSynchronizer:
         print(f"✗ Failed: {error_count}")
         print("=" * 70)
         
+        logger.info("="*70)
+        logger.info("Synchronization Summary")
+        logger.info(f"Total changes processed: {len(changes)}")
+        logger.info(f"Successful: {success_count}")
+        logger.info(f"Failed: {error_count}")
+        logger.info(f"Completion time: {datetime.now().isoformat()}")
+        logger.info("="*70)
+        
         if error_count > 0:
+            logger.error("Synchronization completed with errors")
             sys.exit(1)
+        else:
+            logger.info("Synchronization completed successfully")
 
 
 def main():
     """Main entry point"""
     try:
+        logger.info("Thunder File Mount Sync - Starting execution")
+        logger.info(f"Python version: {sys.version}")
+        logger.info(f"Working directory: {os.getcwd()}")
+        
         # Load configuration
         config = ChoreoConfig.from_env()
         
         # Create API client
+        logger.info("Creating Choreo API client...")
         client = ChoreoAPIClient(config)
         
         # Create synchronizer
         repo_root = os.getenv('GITHUB_WORKSPACE', os.getcwd())
+        logger.info(f"Initializing synchronizer with repo root: {repo_root}")
         synchronizer = FileMountSynchronizer(client, repo_root)
         
         # Get base reference for comparison (default to previous commit)
         base_ref = os.getenv('BASE_REF', 'HEAD^')
+        logger.info(f"Using base reference: {base_ref}")
         
         # Run synchronization
         synchronizer.sync(base_ref)
         
+        logger.info("Execution completed successfully")
+        
     except Exception as e:
+        logger.critical(f"Fatal error: {str(e)}")
         print(f"\n❌ Fatal error: {str(e)}")
         import traceback
+        logger.critical(traceback.format_exc())
         traceback.print_exc()
         sys.exit(1)
 

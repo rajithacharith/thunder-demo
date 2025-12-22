@@ -1,5 +1,5 @@
 {
-    "flowEndpoint": "https://73b41dd9-4ade-4310-a1c0-b7c4b09b7a8a.e1-us-east-azure.choreoapps.dev/flows",
+    "flowEndpoint": "https://73b41dd9-4ade-4310-a1c0-b7c4b09b7a8a.e1-us-east-azure.choreoapps.dev/flow",
     "redirectBasedLogin": false,
     "applicationID": "90bf87e4-ddae-474e-b52c-fddb998138b2",
     "applicationsEndpoint": "https://73b41dd9-4ade-4310-a1c0-b7c4b09b7a8a.e1-us-east-azure.choreoapps.dev/applications"

@@ -1,0 +1,126 @@
+# File: WSO2_Cloud_Authentication_Flow.yaml
+id: 019b4738-6d31-7f9e-9562-5febcd0a3112
+handle: wso2-cloud-flow
+name: WSO2 Cloud Authentication Flow
+flowType: AUTHENTICATION
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: choose_auth
+  - id: choose_auth
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"eventType":"TRIGGER","id":"action_001","label":"{{ t(elements:buttons.google.text) }}","type":"ACTION","variant":"SOCIAL"},{"eventType":"TRIGGER","id":"action_002","label":"{{ t(elements:buttons.github.text) }}","type":"ACTION","variant":"SOCIAL"}],"id":"block_001","type":"BLOCK"}]}
+    actions:
+      - ref: action_001
+        nextNode: google_auth
+      - ref: action_002
+        nextNode: github_auth
+  - id: google_auth
+    type: TASK_EXECUTION
+    inputs:
+      - ref: input_001
+        type: TEXT_INPUT
+        identifier: code
+        required: true
+    properties:
+      allowAuthenticationWithoutLocalUser: true
+      idpId: "907a58326-e947-4b9f-b493-225d9618da2f"
+    executor:
+      name: GoogleOIDCAuthExecutor
+    onSuccess: prompt_ou_details
+  - id: github_auth
+    type: TASK_EXECUTION
+    inputs:
+      - ref: input_002
+        type: TEXT_INPUT
+        identifier: code
+        required: true
+    properties:
+      allowAuthenticationWithoutLocalUser: true
+      idpId: "07a58326-e947-4b9f-b493-225d9618da2f"
+    executor:
+      name: GithubOAuthExecutor
+    onSuccess: prompt_ou_details
+  - id: prompt_ou_details
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"Create Your Organization","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Organization Name","placeholder":"Enter your organization name","ref":"ouName","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Organization Handle","placeholder":"Enter a unique handle (e.g., my-org)","ref":"ouHandle","required":true,"type":"TEXT_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Continue","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    inputs:
+      - ref: input_001
+        type: TEXT_INPUT
+        identifier: ouName
+        required: true
+      - ref: input_002
+        type: TEXT_INPUT
+        identifier: ouHandle
+        required: true
+    actions:
+      - ref: action_001
+        nextNode: ou_creation
+    condition:
+      key: {{ context.userEligibleForProvisioning }}
+      value: true
+      onSkip: publish_login_event
+  - id: ou_creation
+    type: TASK_EXECUTION
+    executor:
+      name: OUExecutor
+    onSuccess: publish_ou_creation_event
+    condition:
+      key: {{ context.userEligibleForProvisioning }}
+      value: true
+      onSkip: publish_login_event
+  - id: publish_ou_creation_event
+    type: TASK_EXECUTION
+    properties:
+      body: {"event":"OU_CREATED","ouHandle":"{{ context.ouHandle }}","ouId":"{{ context.ouId }}","ouName":"{{ context.ouName }}"}
+      headers: {"Content-Type":"application/json"}
+      method: "POST"
+      timeout: 5
+      url: "https://webhook.site/b5335e9e-10b3-41d7-a34d-815f3fad6886"
+    executor:
+      name: HTTPRequestExecutor
+    onSuccess: provisioning
+    condition:
+      key: {{ context.userEligibleForProvisioning }}
+      value: true
+      onSkip: publish_login_event
+  - id: provisioning
+    type: TASK_EXECUTION
+    executor:
+      name: ProvisioningExecutor
+    onSuccess: publish_user_creation_event
+    condition:
+      key: {{ context.userEligibleForProvisioning }}
+      value: true
+      onSkip: publish_login_event
+  - id: publish_user_creation_event
+    type: TASK_EXECUTION
+    properties:
+      timeout: 5
+      url: "https://webhook.site/b5335e9e-10b3-41d7-a34d-815f3fad6886"
+      body: {"email":"{{ context.email }}","event":"USER_CREATED","userId":"{{ context.userID }}"}
+      headers: {"Content-Type":"application/json"}
+      method: "POST"
+    executor:
+      name: HTTPRequestExecutor
+    onSuccess: publish_login_event
+    condition:
+      key: {{ context.userAutoProvisioned }}
+      value: true
+      onSkip: publish_login_event
+  - id: publish_login_event
+    type: TASK_EXECUTION
+    properties:
+      body: {"email":"{{ context.email }}","event":"USER_LOGGED_IN","userId":"{{ context.userID }}"}
+      headers: {"Content-Type":"application/json"}
+      method: "POST"
+      timeout: 5
+      url: "https://webhook.site/b5335e9e-10b3-41d7-a34d-815f3fad6886"
+    executor:
+      name: HTTPRequestExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2025-12-22 18:00:38
+updatedAt: 2025-12-22 18:00:38

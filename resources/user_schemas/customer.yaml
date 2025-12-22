@@ -1,5 +1,0 @@
-id: 8602c755-a326-4531-bfeb-0559b66e19d4
-name: Customer
-organization_unit_id: b7e2c7a2-1f3a-4e2a-9e7c-2f1b7e2c7a21
-allow_self_registration: true
-schema: '{"sub":{"type":"string","required":true,"unique":true},"username":{"type":"string","required":false,"unique":false},"email":{"type":"string","required":false,"unique":false}}'

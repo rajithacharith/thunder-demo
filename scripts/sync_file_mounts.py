@@ -382,26 +382,38 @@ class FileMountSynchronizer:
         # Check if ConfigMap exists
         existing_configmap = configmap_index.get(configmap_name)
         
-        if existing_configmap:
+        if existing_configmap and existing_configmap.get('id'):
             # Get detailed ConfigMap to compare content
             configmap_id = existing_configmap['id']
-            logger.info(f"ConfigMap '{configmap_name}' exists, checking for content changes...")
-            details = self.client.get_configmap_details(configmap_id)
-            existing_content = details.get('data', {}).get('data', '')
-            existing_hash = self.calculate_content_hash(existing_content)
+            logger.info(f"ConfigMap '{configmap_name}' exists (ID: {configmap_id}), checking for content changes...")
             
-            logger.info(f"Existing hash: {existing_hash[:16]}..., New hash: {content_hash[:16]}...")
-            if existing_hash != content_hash:
-                print(f"  ℹ Content changed, updating ConfigMap...")
-                logger.info(f"Content differs, updating ConfigMap '{configmap_name}'")
-                self.client.update_configmap(configmap_id, configmap_name, file_content)
-            else:
-                print(f"  ✓ Content unchanged, skipping ConfigMap update")
-                logger.info(f"Content identical, skipping update for '{configmap_name}'")
+            try:
+                details = self.client.get_configmap_details(configmap_id)
+                existing_content = details.get('data', {}).get('data', '')
+                existing_hash = self.calculate_content_hash(existing_content)
+                
+                logger.info(f"Existing hash: {existing_hash[:16]}..., New hash: {content_hash[:16]}...")
+                if existing_hash != content_hash:
+                    print(f"  ℹ Content changed, updating ConfigMap...")
+                    logger.info(f"Content differs, updating ConfigMap '{configmap_name}'")
+                    self.client.update_configmap(configmap_id, configmap_name, file_content)
+                else:
+                    print(f"  ✓ Content unchanged, skipping ConfigMap update")
+                    logger.info(f"Content identical, skipping update for '{configmap_name}'")
+            except Exception as e:
+                # If we can't get details or update fails, try to create a new one
+                logger.warning(f"Failed to get/update existing ConfigMap '{configmap_name}': {str(e)}")
+                logger.info(f"Will create new ConfigMap instead")
+                print(f"  ⚠ Failed to update existing ConfigMap, creating new one...")
+                configmap_id = self.client.create_configmap(configmap_name, file_content)
         else:
-            # Create new ConfigMap
-            print(f"  ℹ ConfigMap doesn't exist, creating...")
-            logger.info(f"ConfigMap '{configmap_name}' not found, creating new one")
+            # Create new ConfigMap (doesn't exist or missing ID)
+            if existing_configmap:
+                logger.warning(f"ConfigMap '{configmap_name}' exists but has no 'id' field: {existing_configmap}")
+                print(f"  ⚠ ConfigMap exists but is invalid, creating new one...")
+            else:
+                logger.info(f"ConfigMap '{configmap_name}' not found, creating new one")
+                print(f"  ℹ ConfigMap doesn't exist, creating...")
             configmap_id = self.client.create_configmap(configmap_name, file_content)
         
         # Ensure mounts exist for all containers
@@ -431,17 +443,29 @@ class FileMountSynchronizer:
         new_mount_path = self.file_path_to_mount_path(new_path)
         
         print(f"\n🔄 Processing rename: {old_path} → {new_path}")
+        logger.info(f"Processing file rename: {old_path} → {new_path}")
         
         # Delete old mounts
+        mounts_deleted = 0
         for container in containers:
             container_id = container['id']
-            mounts = self.client.get_config_mounts(container_id)
-            
-            for mount in mounts:
-                if mount.get('mount_path') == old_mount_path:
-                    mount_id = mount['id']
-                    print(f"  ℹ Deleting old mount: {old_mount_path}")
-                    self.client.delete_config_mount(container_id, mount_id, old_mount_path)
+            try:
+                mounts = self.client.get_config_mounts(container_id)
+                
+                for mount in mounts:
+                    if mount.get('mount_path') == old_mount_path:
+                        mount_id = mount.get('id')
+                        if mount_id:
+                            print(f"  ℹ Deleting old mount: {old_mount_path}")
+                            self.client.delete_config_mount(container_id, mount_id, old_mount_path)
+                            mounts_deleted += 1
+            except Exception as e:
+                logger.warning(f"Failed to delete old mounts for container {container_id}: {str(e)}")
+                print(f"  ⚠ Failed to delete old mount from container {container_id}")
+        
+        if mounts_deleted == 0:
+            logger.info(f"No old mounts found at path: {old_mount_path}")
+            print(f"  ℹ No old mounts found")
         
         # Update ConfigMap name and content, then create new mounts
         self.sync_file_addition_or_modification(new_path, containers, configmap_index)
@@ -453,28 +477,54 @@ class FileMountSynchronizer:
         mount_path = self.file_path_to_mount_path(file_path)
         
         print(f"\n🗑️  Processing deletion: {file_path}")
+        logger.info(f"Processing deletion for: {file_path}")
         
         # Get ConfigMap ID
         configmap = configmap_index.get(configmap_name)
         if not configmap:
-            print(f"  ⚠ ConfigMap not found: {configmap_name}, skipping")
+            print(f"  ⚠ ConfigMap '{configmap_name}' not found in Choreo, nothing to delete")
+            logger.info(f"ConfigMap '{configmap_name}' doesn't exist, skipping deletion")
             return
         
-        configmap_id = configmap['id']
+        configmap_id = configmap.get('id')
+        if not configmap_id:
+            print(f"  ⚠ ConfigMap '{configmap_name}' has no ID, skipping deletion")
+            logger.warning(f"ConfigMap '{configmap_name}' exists but has no 'id' field: {configmap}")
+            return
+        
+        logger.info(f"Found ConfigMap to delete: {configmap_name} (ID: {configmap_id})")
         
         # Delete mounts from all containers
         print(f"  ℹ Removing mounts from containers...")
+        mounts_deleted = 0
         for container in containers:
             container_id = container['id']
-            mounts = self.client.get_config_mounts(container_id)
-            
-            for mount in mounts:
-                if mount.get('mount_path') == mount_path:
-                    mount_id = mount['id']
-                    self.client.delete_config_mount(container_id, mount_id, mount_path)
+            try:
+                mounts = self.client.get_config_mounts(container_id)
+                
+                for mount in mounts:
+                    if mount.get('mount_path') == mount_path:
+                        mount_id = mount.get('id')
+                        if mount_id:
+                            self.client.delete_config_mount(container_id, mount_id, mount_path)
+                            mounts_deleted += 1
+                        else:
+                            logger.warning(f"Mount at '{mount_path}' has no ID, skipping")
+            except Exception as e:
+                logger.warning(f"Failed to get/delete mounts for container {container_id}: {str(e)}")
+                print(f"  ⚠ Failed to process mounts for container {container_id}")
+        
+        if mounts_deleted == 0:
+            print(f"  ℹ No mounts found for path: {mount_path}")
+            logger.info(f"No mounts found for deletion at path: {mount_path}")
         
         # Delete ConfigMap
-        self.client.delete_configmap(configmap_id, configmap_name)
+        try:
+            self.client.delete_configmap(configmap_id, configmap_name)
+        except Exception as e:
+            logger.error(f"Failed to delete ConfigMap '{configmap_name}': {str(e)}")
+            print(f"  ⚠ Failed to delete ConfigMap: {str(e)}")
+            # Don't raise - we've done our best to clean up
     
     def sync(self, base_ref: str = "HEAD^") -> None:
         """Main synchronization process"""

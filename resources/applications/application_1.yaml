@@ -28,7 +28,7 @@ inbound_auth_config:
       pkce_required: true
       public_client: true
       token:
-        issuer: "https://localhost:8090/oauth2/token"
+        issuer: "https://73b41dd9-4ade-4310-a1c0-b7c4b09b7a8a.e1-us-east-azure.choreoapps.dev/oauth2/token"
         access_token:
           validity_period: 3600
           user_attributes:

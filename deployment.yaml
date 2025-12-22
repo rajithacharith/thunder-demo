@@ -42,3 +42,6 @@ cors:
 
 gate_client:
   scheme: "http"
+
+immutable_resources:
+  enabled: true

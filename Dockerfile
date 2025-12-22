@@ -46,11 +46,12 @@ ENV SERVER_HOST="0.0.0.0" \
     LOG_LEVEL="INFO" \
     DATABASE_TYPE="sqlite"
 
-# Add thunder user with UID 10001 if not already present
-RUN adduser -u 10001 -D thunder
-# Switch back to thunder user for security
-RUN chown -R thunder:thunder /opt/thunder
-USER thunder
+# Ensure proper permissions for all thunder files and directories
+RUN chown -R 10001:10001 /opt/thunder && \
+    chmod -R u+rwX,g+rX,o+rX /opt/thunder
+
+# Switch to thunder user for security
+USER 10001
 
 # Expose the server port
 EXPOSE 8090

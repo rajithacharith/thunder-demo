@@ -12,7 +12,7 @@ certificate:
 inbound_auth_config:
   - type: "oauth2"
     config:
-      client_id: "DEVELOP1"
+      client_id: "DEVELOP"
       redirect_uris:
         - "https://localhost:5191/develop"
         - "https://localhost:5190/gate/signin"

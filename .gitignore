@@ -32,3 +32,5 @@ sync-report.txt
 # Temporary files
 *.tmp
 *.bak
+
+exported_resources.txt

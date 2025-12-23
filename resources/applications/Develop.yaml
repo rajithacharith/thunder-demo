@@ -1,0 +1,63 @@
+# File: Develop.yaml
+id: e0ffc3cf-09a0-4f09-8b3f-f12c2a68fa1c
+name: Develop
+description: Developer application for Thunder
+auth_flow_graph_id: 019b4969-0fa8-71c7-b140-d9acea351112
+registration_flow_graph_id: 019b4969-0fa9-7854-9163-d76b43b4faec
+is_registration_flow_enabled: true
+url: https://localhost:8090/develop
+logo_url: https://localhost:8090/develop/assets/images/trifacta.svg
+token:
+  issuer: https://localhost:8090
+  validity_period: 3600
+certificate:
+  type: NONE
+inbound_auth_config:
+  - type: oauth2
+    config:
+      client_id: {{.DEVELOP_CLIENT_ID}}
+      client_secret: {{.DEVELOP_CLIENT_SECRET}}
+      redirect_uris:
+        {{- range .DEVELOP_REDIRECT_URIS}}
+        - {{.}}
+        {{- end}}
+      grant_types:
+        - authorization_code
+      response_types:
+        - code
+      token_endpoint_auth_method: none
+      pkce_required: true
+      public_client: true
+      token:
+        issuer: https://localhost:8090/oauth2/token
+        access_token:
+          validity_period: 3600
+          user_attributes:
+            - given_name
+            - family_name
+            - email
+            - groups
+            - name
+        id_token:
+          validity_period: 3600
+          user_attributes:
+            - given_name
+            - family_name
+            - email
+            - groups
+            - name
+          scope_claims:
+            profile:
+              - name
+              - given_name
+              - family_name
+              - picture
+            email:
+              - email
+              - email_verified
+            group:
+              - groups
+allowed_user_types:
+  - Person
+
+

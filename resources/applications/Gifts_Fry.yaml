@@ -1,0 +1,44 @@
+# File: Gifts_Fry.yaml
+id: a08cc807-6f4c-41c1-aa6b-7b6f6980e0fe
+name: Gifts Fry
+auth_flow_graph_id: 019b4969-0f04-7ecc-8922-4b293a5a3939
+registration_flow_graph_id: 019b4969-0f04-7443-a5d0-8a81ee072302
+is_registration_flow_enabled: true
+branding_id: ed849509-b4cd-41ca-8823-ad2ccd1e0e3a
+logo_url: https://ssl.gstatic.com/docs/common/profile/leopard_lg.png
+token:
+  issuer: https://localhost:8090
+  validity_period: 3600
+certificate:
+  type: NONE
+inbound_auth_config:
+  - type: oauth2
+    config:
+      client_id: {{.GIFTS_FRY_CLIENT_ID}}
+      client_secret: {{.GIFTS_FRY_CLIENT_SECRET}}
+      redirect_uris:
+        {{- range .GIFTS_FRY_REDIRECT_URIS}}
+        - {{.}}
+        {{- end}}
+      grant_types:
+        - authorization_code
+        - refresh_token
+      response_types:
+        - code
+      token_endpoint_auth_method: none
+      pkce_required: true
+      public_client: true
+      token:
+        issuer: https://localhost:8090
+        access_token:
+          validity_period: 3600
+        id_token:
+          validity_period: 3600
+      scopes:
+        - openid
+        - profile
+        - email
+allowed_user_types:
+  - Person
+
+

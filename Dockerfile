@@ -21,7 +21,7 @@
 # It uses the existing Thunder Docker image as a base and adds Choreo-specific configurations
 
 # Use the existing Thunder image as base
-FROM ghcr.io/rajithacharith/thunder:0.16.0
+FROM ghcr.io/rajithacharith/thunder:0.17.0
 
 # Switch to root for configuration changes
 USER root

@@ -1,30 +1,16 @@
 # File: Default_Authentication_Flow.yaml
-id: 019b4969-0f04-7ecc-8922-4b293a5a3939
+id: 019b49cb-9a71-78cb-8fba-fd95feea4084
 handle: default-basic-flow
 name: Default Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 2
+activeVersion: 1
 nodes:
   - id: start
     type: START
-    layout:
-      size:
-        width: 101
-        height: 34
-      position:
-        x: 62
-        y: 327
     onSuccess: prompt_credentials
   - id: prompt_credentials
     type: PROMPT
-    layout:
-      size:
-        width: 350
-        height: 563
-      position:
-        x: 463
-        y: 62
-    meta: {"components":[{"category":"DISPLAY","id":"text_001","label":"{{ t(signin:heading) }}","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_1"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"input_001","inputType":"text","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"input_002","inputType":"text","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","resourceType":"ELEMENT","type":"BLOCK"}]}
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
     inputs:
       - ref: input_001
         type: TEXT_INPUT
@@ -39,112 +25,22 @@ nodes:
         nextNode: basic_auth
   - id: basic_auth
     type: TASK_EXECUTION
-    layout:
-      size:
-        width: 217
-        height: 113
-      position:
-        x: 1113
-        y: 287
-    inputs:
-      - ref: input_001
-        type: TEXT_INPUT
-        identifier: username
-        required: true
-      - ref: input_002
-        type: PASSWORD_INPUT
-        identifier: password
-        required: true
     executor:
       name: BasicAuthExecutor
-    onSuccess: task_execution_utj0
+    onSuccess: authorization_check
   - id: authorization_check
     type: TASK_EXECUTION
-    layout:
-      size:
-        width: 200
-        height: 113
-      position:
-        x: 3292
-        y: 287
     executor:
       name: AuthorizationExecutor
     onSuccess: auth_assert
   - id: auth_assert
     type: TASK_EXECUTION
-    layout:
-      size:
-        width: 244
-        height: 113
-      position:
-        x: 3792
-        y: 287
     executor:
       name: AuthAssertExecutor
     onSuccess: end
   - id: end
     type: END
-    layout:
-      size:
-        width: 85
-        height: 34
-      position:
-        x: 4336
-        y: 327
-  - id: task_execution_utj0
-    type: TASK_EXECUTION
-    layout:
-      size:
-        width: 200
-        height: 113
-      position:
-        x: 1630
-        y: 284
-    properties:
-      senderId: "b46c9cf5-a3c9-4437-8a0f-3a7c5b05f821"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-    onSuccess: view_ter0
-  - id: view_ter0
-    type: PROMPT
-    layout:
-      size:
-        width: 350
-        height: 524
-      position:
-        x: 2136
-        y: 82
-    meta: {"components":[{"category":"DISPLAY","id":"text_hm1p","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"otp_input_k5sz","inputType":"text","label":"Enter the code sent to your mobile","placeholder":"","ref":"otp","required":false,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"TRIGGER","id":"action_k5s0","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_qec8","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_kk9j","resourceType":"ELEMENT","type":"BLOCK"}]}
-    inputs:
-      - ref: otp_input_k5sz
-        type: OTP_INPUT
-        identifier: otp
-        required: false
-    actions:
-      - ref: action_k5s0
-        nextNode: task_execution_gh8h
-  - id: task_execution_gh8h
-    type: TASK_EXECUTION
-    layout:
-      size:
-        width: 200
-        height: 113
-      position:
-        x: 2786
-        y: 284
-    inputs:
-      - ref: otp_input_k5sz
-        type: OTP_INPUT
-        identifier: otp
-        required: false
-    properties:
-      senderId: "b46c9cf5-a3c9-4437-8a0f-3a7c5b05f821"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-    onSuccess: authorization_check
-createdAt: 2025-12-23 04:13:00
-updatedAt: 2025-12-23 04:18:10
+createdAt: 2025-12-23 06:00:38
+updatedAt: 2025-12-23 06:00:38
 
 

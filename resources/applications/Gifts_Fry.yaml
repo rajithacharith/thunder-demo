@@ -1,7 +1,7 @@
 # File: Gifts_Fry.yaml
 id: a08cc807-6f4c-41c1-aa6b-7b6f6980e0fe
 name: Gifts Fry
-auth_flow_graph_id: 019b4969-0f04-7ecc-8922-4b293a5a3939
+auth_flow_graph_id: 019b49cb-9a71-78cb-8fba-fd95feea4084
 registration_flow_graph_id: 019b4969-0f04-7443-a5d0-8a81ee072302
 is_registration_flow_enabled: true
 branding_id: ed849509-b4cd-41ca-8823-ad2ccd1e0e3a

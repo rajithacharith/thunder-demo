@@ -27,7 +27,7 @@ inbound_auth_config:
         - code
       token_endpoint_auth_method: none
       pkce_required: true
-      public_client: true
+      public_client: false
       token:
         issuer: https://localhost:8090
         access_token:

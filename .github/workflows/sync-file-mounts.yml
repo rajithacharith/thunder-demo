@@ -3,7 +3,7 @@ name: Sync File Mounts to Choreo
 on:
   push:
     branches:
-      - resources
+      - prod
     paths:
       - 'resources/**/*.yaml'
 

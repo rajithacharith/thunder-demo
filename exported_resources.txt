@@ -17,7 +17,7 @@ id: 019bdaad-a516-75c3-95a7-e5926478be77
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 3
+activeVersion: 5
 nodes:
   - id: start
     type: START
@@ -27,32 +27,32 @@ nodes:
         height: 34
       position:
         x: 62
-        y: 87
-    onSuccess: view_ctps
-  - id: view_ctps
+        y: 330
+    onSuccess: view_qwey
+  - id: view_qwey
     type: PROMPT
     layout:
       size:
         width: 350
-        height: 620
+        height: 531
       position:
         x: 310
-        y: -206
-    meta: {"components":[{"category":"DISPLAY","id":"text_ojhj","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_8o05","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_qq3n","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_x3tk","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"DISPLAY","id":"rich_text_ykll","label":"\u003cp class=\"rich-text-paragraph\"\u003e\u003cspan class=\"rich-text-pre-wrap\"\u003eDon't have an account? \u003c/span\u003e\u003ca href=\"{{application.selfRegisterUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"rich-text-link\"\u003e\u003cspan class=\"rich-text-pre-wrap\"\u003eSign up\u003c/span\u003e\u003c/a\u003e\u003c/p\u003e","resourceType":"ELEMENT","type":"RICH_TEXT"}],"id":"block_vwqh","resourceType":"ELEMENT","type":"BLOCK"}]}
+        y: 63
+    meta: {"components":[{"category":"DISPLAY","id":"text_v2q3","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_8ztr","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_s6lf","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_hmdl","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_782r","resourceType":"ELEMENT","type":"BLOCK"}]}
     prompts:
       - inputs:
-          - ref: text_input_8o05
+          - ref: text_input_8ztr
             type: TEXT_INPUT
             identifier: username
             required: true
-          - ref: password_input_qq3n
+          - ref: password_input_s6lf
             type: PASSWORD_INPUT
             identifier: password
             required: true
         action:
-          ref: action_x3tk
-          nextNode: ID_8wdn
-  - id: ID_8wdn
+          ref: action_hmdl
+          nextNode: ID_7hz5
+  - id: ID_7hz5
     type: TASK_EXECUTION
     layout:
       size:
@@ -60,28 +60,95 @@ nodes:
         height: 113
       position:
         x: 820
-        y: 108
+        y: 291
     executor:
       name: BasicAuthExecutor
       inputs:
-        - ref: text_input_8o05
+        - ref: text_input_8ztr
           type: TEXT_INPUT
           identifier: username
           required: true
-        - ref: password_input_qq3n
+        - ref: password_input_s6lf
           type: PASSWORD_INPUT
           identifier: password
           required: true
-    onSuccess: ID_d8oa
-  - id: ID_d8oa
+    onSuccess: ID_b3kq
+  - id: ID_b3kq
+    type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 1200
+        y: 291
+    properties:
+      senderId: "1889f6d5-1a59-4ea8-8552-96f96a143ac5"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: send
+      inputs:
+        - ref: otp_input_d8kc
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_sgem
+  - id: ID_sgem
+    type: PROMPT
+    layout:
+      size:
+        width: 350
+        height: 556
+      position:
+        x: 1550
+        y: 69
+    meta: {"components":[{"category":"DISPLAY","id":"text_zo52","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"otp_input_d8kc","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_kjef","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_lstz","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_jp7y","resourceType":"ELEMENT","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: otp_input_d8kc
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: action_kjef
+          nextNode: ID_hxqt
+      - inputs:
+          - ref: otp_input_d8kc
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: resend_lstz
+          nextNode: ID_b3kq
+  - id: ID_hxqt
+    type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 2050
+        y: 291
+    properties:
+      senderId: "1889f6d5-1a59-4ea8-8552-96f96a143ac5"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: verify
+      inputs:
+        - ref: otp_input_d8kc
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_vgj3
+  - id: ID_vgj3
     type: TASK_EXECUTION
     layout:
       size:
         width: 244
         height: 113
       position:
-        x: 1234
-        y: 108
+        x: 2400
+        y: 291
     executor:
       name: AuthAssertExecutor
     onSuccess: END
@@ -92,10 +159,10 @@ nodes:
         width: 85
         height: 34
       position:
-        x: 1650
-        y: 147
+        x: 2800
+        y: 330
 createdAt: 2026-01-20 09:12:51
-updatedAt: 2026-01-20 11:41:32
+updatedAt: 2026-01-20 12:26:24
 
 ---
 # File: Default_Basic_Registration_Flow.yaml

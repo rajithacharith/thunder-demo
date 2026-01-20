@@ -23,7 +23,6 @@ inbound_auth_config:
   - type: oauth2
     config:
       client_id: {{.SAMPLE_PAYROLL_APP_CLIENT_ID}}
-      client_secret: {{.SAMPLE_PAYROLL_APP_CLIENT_SECRET}}
       redirect_uris:
         {{- range .SAMPLE_PAYROLL_APP_REDIRECT_URIS}}
         - {{.}}

@@ -1,0 +1,14 @@
+# File: Webhook_SMS_Sender.yaml
+id: 3b96ceff-f2fb-417a-8ce6-617cd54afd78
+name: Webhook SMS Sender
+description: SMS sender that posts to webhook.site
+provider: custom
+properties:
+  - name: url
+    value: {{.WEBHOOK_SMS_SENDER_URL}}
+  - name: http_method
+    value: {{.WEBHOOK_SMS_SENDER_HTTP_METHOD}}
+  - name: content_type
+    value: {{.WEBHOOK_SMS_SENDER_CONTENT_TYPE}}
+
+

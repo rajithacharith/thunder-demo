@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Get IDs from environment variables
-NOTIFICATION_SENDER_ID="${NOTIFICATION_SENDER_ID:-}"
-FLOW_ID="${FLOW_ID:-}"
 ASSERTION="${ASSERTION:-}"
 
 # Create output directories if they don't exist
@@ -12,89 +9,164 @@ mkdir -p resources/flows
 echo "📦 Exporting resources..."
 echo ""
 
-# Export notification sender
-if [ -n "$NOTIFICATION_SENDER_ID" ]; then
-    echo "🔹 Exporting notification sender with ID: $NOTIFICATION_SENDER_ID"
-    RESPONSE=$(curl --location 'https://localhost:8090/export' -k \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/yaml' \
-    --header "Authorization: Bearer ${ASSERTION}" \
-    --silent \
-    --data "{
-        \"notificationSenders\": [
-            \"$NOTIFICATION_SENDER_ID\"
-        ],
-        \"options\": {
-            \"include_metadata\": true,
-            \"format\": \"yaml\",
-            \"folder_structure\": {
-                \"group_by_type\": true,
-                \"file_naming_pattern\": \"\${name}_\${id}\"
-            }
+RESPONSE=$(curl --location 'https://localhost:8090/export' -k \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/yaml' \
+--header "Authorization: Bearer ${ASSERTION}" \
+--silent \
+--data "{
+    \"flows\": [\"019bda18-9239-7806-982e-009fcf17b1ac\"],
+    \"notification_senders\": [\"*\"],
+    \"options\": {
+        \"include_metadata\": true,
+        \"format\": \"yaml\",
+        \"folder_structure\": {
+            \"group_by_type\": true,
+            \"file_naming_pattern\": \"\${name}\"
         }
-    }")
+    }
+}")
 
-    if [ $? -eq 0 ] && [ -n "$RESPONSE" ]; then
-        FILENAME=$(echo "$RESPONSE" | grep "# File:" | head -1 | sed 's/# File: //')
-        
-        if [ -z "$FILENAME" ]; then
-            FILENAME="notification_sender_${NOTIFICATION_SENDER_ID}.yaml"
-        fi
-        
-        OUTPUT_FILE="resources/notification_senders/$FILENAME"
-        echo "$RESPONSE" > "$OUTPUT_FILE"
-        
-        echo "✅ Notification sender exported successfully to: $OUTPUT_FILE"
-    else
-        echo "❌ Failed to export notification sender"
-    fi
-else
-    echo "⚠️  Skipping notification sender export (NOTIFICATION_SENDER_ID not set)"
-    echo "💡 Set NOTIFICATION_SENDER_ID environment variable to export a notification sender"
+if [ $? -ne 0 ] || [ -z "$RESPONSE" ]; then
+    echo "❌ Failed to export resources"
+    exit 1
 fi
 
+# Store the complete response to a text file
+echo "$RESPONSE" > exported_resources.txt
+echo "💾 Saved complete response to: exported_resources.txt"
 echo ""
 
-# Export flow
-if [ -n "$FLOW_ID" ]; then
-    echo "🔹 Exporting flow with ID: $FLOW_ID"
-    RESPONSE=$(curl --location 'https://localhost:8090/export' -k \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/yaml' \
-    --header "Authorization: Bearer ${ASSERTION}" \
-    --silent \
-    --data "{
-        \"flows\": [
-            \"$FLOW_ID\"
-        ],
-        \"options\": {
-            \"include_metadata\": true,
-            \"format\": \"yaml\",
-            \"folder_structure\": {
-                \"group_by_type\": true,
-                \"file_naming_pattern\": \"\${name}_\${id}\"
-            }
-        }
-    }")
+echo "📄 Processing exported resources..."
+echo ""
 
-    if [ $? -eq 0 ] && [ -n "$RESPONSE" ]; then
-        FILENAME=$(echo "$RESPONSE" | grep "# File:" | head -1 | sed 's/# File: //')
-        
-        if [ -z "$FILENAME" ]; then
-            FILENAME="flow_${FLOW_ID}.yaml"
+# Save response to a temp file for processing
+TEMP_FILE=$(mktemp)
+echo "$RESPONSE" > "$TEMP_FILE"
+
+# Function to extract and save individual YAML files
+extract_yaml_files() {
+    local current_file=""
+    local current_content=""
+    local in_document=false
+    local resource_type=""
+    
+    while IFS= read -r line; do
+        # Detect file header comment
+        if [[ "$line" =~ ^#\ File:\ (.+)$ ]]; then
+            # Save previous file if exists
+            if [ -n "$current_file" ] && [ -n "$current_content" ]; then
+                save_resource_file "$resource_type" "$current_file" "$current_content"
+            fi
+            
+            # Start new file
+            current_file="${BASH_REMATCH[1]}"
+            current_content="$line"$'\n'
+            in_document=true
+            resource_type=""  # Reset, will be determined from content
+            
+        elif [[ "$line" == "---" ]] && [ "$in_document" = true ]; then
+            # Document separator - save current and reset
+            if [ -n "$current_file" ] && [ -n "$current_content" ]; then
+                # Determine type from content if not already set
+                if [ -z "$resource_type" ]; then
+                    resource_type=$(detect_resource_type "$current_content" "$current_file")
+                fi
+                save_resource_file "$resource_type" "$current_file" "$current_content"
+            fi
+            current_file=""
+            current_content=""
+            in_document=false
+            resource_type=""
+            
+        elif [ "$in_document" = true ]; then
+            current_content+="$line"$'\n'
+            
+            # Detect resource type from content on the fly
+            if [ -z "$resource_type" ]; then
+                if [[ "$line" =~ ^flowType:\ (AUTHENTICATION|REGISTRATION) ]]; then
+                    resource_type="flows"
+                elif [[ "$line" =~ ^auth_flow_graph_id: ]] || [[ "$line" =~ ^inbound_auth_config: ]]; then
+                    resource_type="applications"
+                elif [[ "$line" =~ ^federation_protocol: ]] || [[ "$line" =~ ^idp_type: ]]; then
+                    resource_type="identity_providers"
+                elif [[ "$line" =~ ^ou_type: ]] || [[ "$line" =~ ^parent_ou_id: ]]; then
+                    resource_type="organization_units"
+                elif [[ "$line" =~ ^schema_type: ]] || [[ "$line" =~ ^schema_attributes: ]]; then
+                    resource_type="user_schemas"
+                elif [[ "$line" =~ ^sender_type: ]] || [[ "$line" =~ ^notification_provider: ]]; then
+                    resource_type="notification_senders"
+                fi
+            fi
         fi
-        
-        OUTPUT_FILE="resources/flows/$FILENAME"
-        echo "$RESPONSE" > "$OUTPUT_FILE"
-        
-        echo "✅ Flow exported successfully to: $OUTPUT_FILE"
-    else
-        echo "❌ Failed to export flow"
+    done < "$TEMP_FILE"
+    
+    # Save the last file
+    if [ -n "$current_file" ] && [ -n "$current_content" ]; then
+        if [ -z "$resource_type" ]; then
+            resource_type=$(detect_resource_type "$current_content" "$current_file")
+        fi
+        save_resource_file "$resource_type" "$current_file" "$current_content"
     fi
-else
-    echo "⚠️  Skipping flow export (FLOW_ID not set)"
-    echo "💡 Set FLOW_ID environment variable to export a flow"
-fi
+}
+
+# Function to detect resource type from content and filename
+detect_resource_type() {
+    local content="$1"
+    local filename="$2"
+    
+    # Check content for type indicators
+    if echo "$content" | grep -q "^flowType:"; then
+        echo "flows"
+    elif echo "$content" | grep -q "^auth_flow_graph_id:\|^inbound_auth_config:"; then
+        echo "applications"
+    elif echo "$content" | grep -q "^federation_protocol:\|^idp_type:"; then
+        echo "identity_providers"
+    elif echo "$content" | grep -q "^ou_type:\|^parent_ou_id:"; then
+        echo "organization_units"
+    elif echo "$content" | grep -q "^schema_type:\|^schema_attributes:"; then
+        echo "user_schemas"
+    elif echo "$content" | grep -q "^sender_type:\|^notification_provider:"; then
+        echo "notification_senders"
+    # Fallback to filename patterns
+    elif [[ "$filename" =~ _Flow\.yaml$ ]] || [[ "$filename" =~ _flow\.yaml$ ]]; then
+        echo "flows"
+    elif [[ "$filename" =~ _Application\.yaml$ ]] || [[ "$filename" =~ _application\.yaml$ ]]; then
+        echo "applications"
+    elif [[ "$filename" =~ _IDP\.yaml$ ]] || [[ "$filename" =~ _idp\.yaml$ ]]; then
+        echo "identity_providers"
+    elif [[ "$filename" =~ _OU\.yaml$ ]] || [[ "$filename" =~ _ou\.yaml$ ]]; then
+        echo "organization_units"
+    elif [[ "$filename" =~ _Schema\.yaml$ ]] || [[ "$filename" =~ _schema\.yaml$ ]]; then
+        echo "user_schemas"
+    elif [[ "$filename" =~ _Sender\.yaml$ ]] || [[ "$filename" =~ _sender\.yaml$ ]]; then
+        echo "notification_senders"
+    else
+        # Default based on simple filename (if no underscore pattern, likely an application)
+        echo "applications"
+    fi
+}
+
+# Function to save resource file to appropriate directory
+save_resource_file() {
+    local type="$1"
+    local filename="$2"
+    local content="$3"
+    
+    local output_dir="resources/$type"
+    mkdir -p "$output_dir"
+    
+    local output_path="$output_dir/$filename"
+    echo "$content" > "$output_path"
+    
+    echo "✅ Saved: $output_path"
+}
+
+# Extract and save all files
+extract_yaml_files
+
+# Clean up temp file
+rm -f "$TEMP_FILE"
 
 echo ""
 echo "🎉 Export process completed!"

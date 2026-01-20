@@ -1,0 +1,71 @@
+# File: Sample_Payroll_App.yaml
+id: cdb1e24a-6eb3-471c-8d3f-c02590b2cdd4
+name: Sample Payroll App
+description: React payroll application with Thunder authentication
+auth_flow_id: 019bda18-9239-7806-982e-009fcf17b1ac
+registration_flow_id: 019bda18-923a-7fd1-92cd-7cb393082ebf
+token:
+  issuer: https://localhost:8090
+  validity_period: 3600
+  user_attributes:
+    - email
+    - name
+    - given_name
+    - family_name
+    - profile
+    - picture
+    - phone_number
+    - address
+    - created_at
+certificate:
+  type: NONE
+inbound_auth_config:
+  - type: oauth2
+    config:
+      client_id: {{.SAMPLE_PAYROLL_APP_CLIENT_ID}}
+      client_secret: {{.SAMPLE_PAYROLL_APP_CLIENT_SECRET}}
+      redirect_uris:
+        {{- range .SAMPLE_PAYROLL_APP_REDIRECT_URIS}}
+        - {{.}}
+        {{- end}}
+      grant_types:
+        - authorization_code
+        - refresh_token
+      response_types:
+        - code
+      token_endpoint_auth_method: none
+      pkce_required: true
+      public_client: true
+      token:
+        issuer: https://localhost:8090
+        access_token:
+          validity_period: 3600
+          user_attributes:
+            - sub
+            - email
+            - name
+            - given_name
+            - family_name
+            - profile
+            - picture
+            - phone_number
+            - address
+            - created_at
+        id_token:
+          validity_period: 3600
+          user_attributes:
+            - sub
+            - email
+            - name
+            - given_name
+            - family_name
+            - profile
+            - picture
+            - phone_number
+            - address
+            - created_at
+      scopes:
+        - openid
+        - profile
+        - email
+

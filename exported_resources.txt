@@ -1,3 +1,17 @@
+# File: Webhook_SMS_Sender.yaml
+id: 1889f6d5-1a59-4ea8-8552-96f96a143ac5
+name: Webhook SMS Sender
+description: SMS sender that posts to webhook.site
+provider: custom
+properties:
+  - name: url
+    value: {{.WEBHOOK_SMS_SENDER_URL}}
+  - name: http_method
+    value: {{.WEBHOOK_SMS_SENDER_HTTP_METHOD}}
+  - name: content_type
+    value: {{.WEBHOOK_SMS_SENDER_CONTENT_TYPE}}
+
+---
 # File: Default_Basic_Authentication_Flow.yaml
 id: 019bdaad-a516-75c3-95a7-e5926478be77
 handle: default-basic-flow
@@ -84,295 +98,95 @@ createdAt: 2026-01-20 09:12:51
 updatedAt: 2026-01-20 11:41:32
 
 ---
-# File: Develop.yaml
-id: 4afdb31e-29d4-4b5e-8dbb-217b2790e08b
-name: Develop
-description: Developer application for Thunder
-auth_flow_id: 019bdaad-a882-7613-940b-cfdb3cd2a26b
-registration_flow_id: 019bdaad-a882-79d6-8021-4b0e99362db0
-is_registration_flow_enabled: true
-url: https://localhost:8090/develop
-logo_url: https://localhost:8090/develop/assets/images/logo-mini.svg
-token:
-  issuer: https://localhost:8090
-  validity_period: 3600
-certificate:
-  type: NONE
-inbound_auth_config:
-  - type: oauth2
-    config:
-      client_id: {{.DEVELOP_CLIENT_ID}}
-      client_secret: {{.DEVELOP_CLIENT_SECRET}}
-      redirect_uris:
-        {{- range .DEVELOP_REDIRECT_URIS}}
-        - {{.}}
-        {{- end}}
-      grant_types:
-        - authorization_code
-      response_types:
-        - code
-      token_endpoint_auth_method: none
-      pkce_required: true
-      public_client: true
-      token:
-        issuer: https://localhost:8090/oauth2/token
-        access_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-            - name
-        id_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-            - name
-          scope_claims:
-            email:
-              - email
-              - email_verified
-            group:
-              - groups
-            phone:
-              - phone_number
-              - phone_number_verified
-            profile:
-              - name
-              - given_name
-              - family_name
-              - picture
-allowed_user_types:
-  - Person
-
----
-# File: Sample_App.yaml
-id: 17826d27-2a12-412b-9fec-9f9d618c9397
-name: Sample App
-description: Sample application for testing
-auth_flow_id: 019bdaad-a516-75c3-95a7-e5926478be77
-registration_flow_id: 019bdaad-a516-71ab-b4f7-912c43bc213d
-is_registration_flow_enabled: true
-url: https://localhost:3000
-logo_url: https://localhost:3000/logo.png
-tos_uri: https://localhost:3000/terms
-policy_uri: https://localhost:3000/privacy
-contacts:
-  - admin@example.com
-  - support@example.com
-token:
-  issuer: https://localhost:8090
-  validity_period: 3600
-certificate:
-  type: NONE
-inbound_auth_config:
-  - type: oauth2
-    config:
-      client_id: {{.SAMPLE_APP_CLIENT_ID}}
-      client_secret: {{.SAMPLE_APP_CLIENT_SECRET}}
-      redirect_uris:
-        {{- range .SAMPLE_APP_REDIRECT_URIS}}
-        - {{.}}
-        {{- end}}
-      grant_types:
-        - authorization_code
-      response_types:
-        - code
-      token_endpoint_auth_method: none
-      pkce_required: true
-      public_client: true
-      token:
-        issuer: thunder
-        access_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-        id_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-          scope_claims:
-            email:
-              - email
-              - email_verified
-            group:
-              - groups
-            phone:
-              - phone_number
-              - phone_number_verified
-            profile:
-              - name
-              - given_name
-              - family_name
-              - picture
-      scopes:
-        - openid
-        - profile
-        - email
-allowed_user_types:
-  - Customer
-
----
-# File: React_SDK_Sample.yaml
-id: f6f1b54b-656e-44f5-85e8-0e0a36b92bb1
-name: React SDK Sample
-description: Sample React application using Thunder React SDK
-auth_flow_id: 019bdaad-a516-75c3-95a7-e5926478be77
-registration_flow_id: 019bdaad-a516-71ab-b4f7-912c43bc213d
-is_registration_flow_enabled: true
-url: https://localhost:3000
-logo_url: https://localhost:3000/logo.png
-tos_uri: https://localhost:3000/terms
-policy_uri: https://localhost:3000/privacy
-contacts:
-  - admin@example.com
-token:
-  issuer: thunder
-  validity_period: 3600
-certificate:
-  type: NONE
-inbound_auth_config:
-  - type: oauth2
-    config:
-      client_id: {{.REACT_SDK_SAMPLE_CLIENT_ID}}
-      client_secret: {{.REACT_SDK_SAMPLE_CLIENT_SECRET}}
-      redirect_uris:
-        {{- range .REACT_SDK_SAMPLE_REDIRECT_URIS}}
-        - {{.}}
-        {{- end}}
-      grant_types:
-        - authorization_code
-      response_types:
-        - code
-      token_endpoint_auth_method: none
-      pkce_required: true
-      public_client: true
-      token:
-        issuer: https://localhost:8090/oauth2/token
-        access_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-            - name
-        id_token:
-          validity_period: 3600
-          user_attributes:
-            - given_name
-            - family_name
-            - email
-            - groups
-            - name
-          scope_claims:
-            email:
-              - email
-              - email_verified
-            group:
-              - groups
-            phone:
-              - phone_number
-              - phone_number_verified
-            profile:
-              - name
-              - given_name
-              - family_name
-              - picture
-allowed_user_types:
-  - Customer
-
----
-# File: Payroll_App.yaml
-id: d2e863d8-9bb2-4a66-b661-3d53e4db6611
-name: Payroll App
-description: Sample Payroll Application with Thunder authentication
-auth_flow_id: 019bdaad-a516-75c3-95a7-e5926478be77
-registration_flow_id: 019bdaad-a516-71ab-b4f7-912c43bc213d
-is_registration_flow_enabled: true
-token:
-  issuer: https://localhost:8090
-  validity_period: 3600
-  user_attributes:
-    - email
-    - name
-    - given_name
-    - family_name
-    - profile
-    - picture
-    - phone_number
-    - address
-    - created_at
-certificate:
-  type: NONE
-inbound_auth_config:
-  - type: oauth2
-    config:
-      client_id: {{.PAYROLL_APP_CLIENT_ID}}
-      client_secret: {{.PAYROLL_APP_CLIENT_SECRET}}
-      redirect_uris:
-        {{- range .PAYROLL_APP_REDIRECT_URIS}}
-        - {{.}}
-        {{- end}}
-      grant_types:
-        - authorization_code
-        - refresh_token
-      response_types:
-        - code
-      token_endpoint_auth_method: none
-      pkce_required: true
-      public_client: true
-      token:
-        issuer: https://localhost:8090
-        access_token:
-          validity_period: 3600
-          user_attributes:
-            - email
-            - name
-            - given_name
-            - family_name
-            - profile
-            - picture
-            - phone_number
-            - address
-            - created_at
-        id_token:
-          validity_period: 3600
-          user_attributes:
-            - email
-            - name
-            - given_name
-            - family_name
-            - profile
-            - picture
-            - phone_number
-            - address
-            - created_at
-      scopes:
-        - openid
-        - profile
-        - email
-
----
-# File: Webhook_SMS_Sender.yaml
-id: 1889f6d5-1a59-4ea8-8552-96f96a143ac5
-name: Webhook SMS Sender
-description: SMS sender that posts to webhook.site
-provider: custom
-properties:
-  - name: url
-    value: {{.WEBHOOK_SMS_SENDER_URL}}
-  - name: http_method
-    value: {{.WEBHOOK_SMS_SENDER_HTTP_METHOD}}
-  - name: content_type
-    value: {{.WEBHOOK_SMS_SENDER_CONTENT_TYPE}}
+# File: Default_Basic_Registration_Flow.yaml
+id: 019bdaad-a516-71ab-b4f7-912c43bc213d
+handle: default-basic-flow
+name: Default Basic Registration Flow
+flowType: REGISTRATION
+activeVersion: 2
+nodes:
+  - id: start
+    type: START
+    onSuccess: user_type_resolver
+  - id: user_type_resolver
+    type: TASK_EXECUTION
+    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
+    executor:
+      name: UserTypeResolver
+    onSuccess: prompt_credentials
+  - id: prompt_credentials
+    type: PROMPT
+    meta: {"components":[{"id":"heading_credentials","label":"Sign Up","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_username","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_credentials","label":"Continue","type":"ACTION","variant":"PRIMARY"}],"id":"block_credentials","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_username
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_password
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+        action:
+          ref: action_credentials
+          nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
+    executor:
+      name: BasicAuthExecutor
+    onSuccess: prompt_user_info
+  - id: prompt_user_info
+    type: PROMPT
+    meta: {"components":[{"id":"heading_user_info","label":"Sign Up","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_firstName","label":"First Name","placeholder":"Enter your first name","ref":"firstName","required":true,"type":"TEXT_INPUT"},{"id":"input_lastName","label":"Last Name","placeholder":"Enter your last name","ref":"lastName","required":true,"type":"TEXT_INPUT"},{"id":"input_email","label":"Email Address","placeholder":"Enter your email address","ref":"email","required":true,"type":"EMAIL_INPUT"},{"eventType":"SUBMIT","id":"action_user_info","label":"Sign Up","type":"ACTION","variant":"PRIMARY"}],"id":"block_user_info","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_firstName
+            type: TEXT_INPUT
+            identifier: firstName
+            required: true
+          - ref: input_lastName
+            type: TEXT_INPUT
+            identifier: lastName
+            required: true
+          - ref: input_email
+            type: EMAIL_INPUT
+            identifier: email
+            required: true
+        action:
+          ref: action_user_info
+          nextNode: provisioning
+  - id: provisioning
+    type: TASK_EXECUTION
+    executor:
+      name: ProvisioningExecutor
+      inputs:
+        - ref: input_001
+          type: TEXT_INPUT
+          identifier: username
+          required: true
+        - ref: input_002
+          type: PASSWORD_INPUT
+          identifier: password
+          required: true
+        - ref: input_003
+          type: TEXT_INPUT
+          identifier: firstName
+          required: true
+        - ref: input_004
+          type: TEXT_INPUT
+          identifier: lastName
+          required: true
+        - ref: input_005
+          type: EMAIL_INPUT
+          identifier: email
+          required: true
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-20 09:12:51
+updatedAt: 2026-01-20 09:12:52

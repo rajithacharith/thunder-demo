@@ -17,6 +17,7 @@ RESPONSE=$(curl --location 'https://localhost:8090/export' -k \
 --data "{
     \"flows\": [\"019bdaad-a516-75c3-95a7-e5926478be77\"],
     \"notification_senders\": [\"*\"],
+    \"applications\": [\"*\"],
     \"options\": {
         \"include_metadata\": true,
         \"format\": \"yaml\",

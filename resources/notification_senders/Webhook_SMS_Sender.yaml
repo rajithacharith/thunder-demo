@@ -11,4 +11,3 @@ properties:
   - name: content_type
     value: {{.WEBHOOK_SMS_SENDER_CONTENT_TYPE}}
 
-

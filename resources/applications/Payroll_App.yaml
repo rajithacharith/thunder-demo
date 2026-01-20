@@ -1,9 +1,10 @@
-# File: Sample_Payroll_App.yaml
-id: cdb1e24a-6eb3-471c-8d3f-c02590b2cdd4
-name: Sample Payroll App
-description: React payroll application with Thunder authentication
-auth_flow_id: 019bda18-9239-7806-982e-009fcf17b1ac
-registration_flow_id: 019bda18-923a-7fd1-92cd-7cb393082ebf
+# File: Payroll_App.yaml
+id: d2e863d8-9bb2-4a66-b661-3d53e4db6611
+name: Payroll App
+description: Sample Payroll Application with Thunder authentication
+auth_flow_id: 019bdaad-a516-75c3-95a7-e5926478be77
+registration_flow_id: 019bdaad-a516-71ab-b4f7-912c43bc213d
+is_registration_flow_enabled: true
 token:
   issuer: https://localhost:8090
   validity_period: 3600
@@ -22,9 +23,9 @@ certificate:
 inbound_auth_config:
   - type: oauth2
     config:
-      client_id: {{.SAMPLE_PAYROLL_APP_CLIENT_ID}}
+      client_id: {{.PAYROLL_APP_CLIENT_ID}}
       redirect_uris:
-        {{- range .SAMPLE_PAYROLL_APP_REDIRECT_URIS}}
+        {{- range .PAYROLL_APP_REDIRECT_URIS}}
         - {{.}}
         {{- end}}
       grant_types:
@@ -40,7 +41,6 @@ inbound_auth_config:
         access_token:
           validity_period: 3600
           user_attributes:
-            - sub
             - email
             - name
             - given_name
@@ -53,7 +53,6 @@ inbound_auth_config:
         id_token:
           validity_period: 3600
           user_attributes:
-            - sub
             - email
             - name
             - given_name
@@ -67,4 +66,5 @@ inbound_auth_config:
         - openid
         - profile
         - email
+
 

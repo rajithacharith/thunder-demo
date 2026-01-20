@@ -1,3 +1,17 @@
+# File: Webhook_SMS_Sender.yaml
+id: 1889f6d5-1a59-4ea8-8552-96f96a143ac5
+name: Webhook SMS Sender
+description: SMS sender that posts to webhook.site
+provider: custom
+properties:
+  - name: url
+    value: {{.WEBHOOK_SMS_SENDER_URL}}
+  - name: http_method
+    value: {{.WEBHOOK_SMS_SENDER_HTTP_METHOD}}
+  - name: content_type
+    value: {{.WEBHOOK_SMS_SENDER_CONTENT_TYPE}}
+
+---
 # File: Default_Basic_Authentication_Flow.yaml
 id: 019bdaad-a516-75c3-95a7-e5926478be77
 handle: default-basic-flow
@@ -82,4 +96,3 @@ nodes:
         y: 147
 createdAt: 2026-01-20 09:12:51
 updatedAt: 2026-01-20 11:41:32
-

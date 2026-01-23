@@ -1,0 +1,87 @@
+# File: User_Onboarding_Flow.yaml
+id: 019bec19-b82e-7e65-81cc-db11bc765fb0
+handle: default-user-onboarding
+name: User Onboarding Flow
+flowType: USER_ONBOARDING
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: permission_validator
+  - id: permission_validator
+    type: TASK_EXECUTION
+    properties:
+      requiredScopes: ["system"]
+    executor:
+      name: PermissionValidator
+    onSuccess: user_type_resolver
+  - id: user_type_resolver
+    type: TASK_EXECUTION
+    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
+    executor:
+      name: UserTypeResolver
+    onSuccess: prompt_email
+  - id: prompt_email
+    type: PROMPT
+    meta: {"components":[{"id":"text_header_email","label":"User Email","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_prompt_email","label":"Email","placeholder":"Enter email","ref":"email","required":true,"type":"EMAIL_INPUT"},{"eventType":"SUBMIT","id":"action_submit_email","label":"Next","type":"ACTION","variant":"PRIMARY"}],"id":"block_email","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_prompt_email
+            type: EMAIL_INPUT
+            identifier: email
+            required: true
+        action:
+          ref: action_submit_email
+          nextNode: invite
+  - id: invite
+    type: TASK_EXECUTION
+    executor:
+      name: InviteExecutor
+    onSuccess: prompt_user_details
+  - id: prompt_user_details
+    type: PROMPT
+    meta: {"components":[{"id":"text_header_details","label":"User Details","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_prompt_username","label":"Username","placeholder":"Enter username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_prompt_given_name","label":"First Name","placeholder":"Enter first name","ref":"given_name","required":false,"type":"TEXT_INPUT"},{"id":"input_prompt_family_name","label":"Last Name","placeholder":"Enter last name","ref":"family_name","required":false,"type":"TEXT_INPUT"},{"id":"input_prompt_phone","label":"Phone Number","placeholder":"Enter phone number","ref":"phone_number","required":false,"type":"TEXT_INPUT"},{"eventType":"SUBMIT","id":"action_submit_details","label":"Next","type":"ACTION","variant":"PRIMARY"}],"id":"block_user_details","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_prompt_username
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_prompt_given_name
+            type: TEXT_INPUT
+            identifier: given_name
+            required: false
+          - ref: input_prompt_family_name
+            type: TEXT_INPUT
+            identifier: family_name
+            required: false
+          - ref: input_prompt_phone
+            type: TEXT_INPUT
+            identifier: phone_number
+            required: false
+        action:
+          ref: action_submit_details
+          nextNode: prompt_credential
+  - id: prompt_credential
+    type: PROMPT
+    meta: {"components":[{"id":"text_header_pwd","label":"Set Password","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_prompt_password","label":"Password","placeholder":"Enter password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_submit_pwd","label":"Set Password","type":"ACTION","variant":"PRIMARY"}],"id":"block_pwd","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_prompt_password
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+        action:
+          ref: action_submit_pwd
+          nextNode: provisioning
+  - id: provisioning
+    type: TASK_EXECUTION
+    executor:
+      name: ProvisioningExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-23 18:24:27
+updatedAt: 2026-01-23 18:24:27
+
+

@@ -1,7 +1,7 @@
-# File: Default_Basic_Authentication_Flow.yaml
-id: 019bec19-b76a-7d77-a8f4-f81b290fedaf
-handle: default-basic-flow
-name: Default Basic Authentication Flow
+# File: Develop_App_Authentication_Flow.yaml
+id: 019bec19-b8c8-710d-ab08-f58837aea9db
+handle: develop-app-flow
+name: Develop App Authentication Flow
 flowType: AUTHENTICATION
 activeVersion: 1
 nodes:
@@ -41,7 +41,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:24:26
-updatedAt: 2026-01-23 18:24:26
+createdAt: 2026-01-23 18:24:27
+updatedAt: 2026-01-23 18:24:27
 
 

@@ -1,5 +1,5 @@
 # File: Default_Basic_Authentication_Flow.yaml
-id: 019bec19-b76a-7d77-a8f4-f81b290fedaf
+id: 019bec22-db72-72cf-8769-260a999b5c15
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
@@ -41,7 +41,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:24:26
-updatedAt: 2026-01-23 18:24:26
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
 
 

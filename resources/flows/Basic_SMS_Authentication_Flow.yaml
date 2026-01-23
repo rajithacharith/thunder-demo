@@ -1,5 +1,5 @@
 # File: Basic_SMS_Authentication_Flow.yaml
-id: 019bec19-b794-75b4-9ba8-c9ee0ab538de
+id: 019bec22-dba3-7a6c-826c-4ff88debcb70
 handle: auth-flow-basic-sms
 name: Basic SMS Authentication Flow
 flowType: AUTHENTICATION
@@ -63,7 +63,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
 
 

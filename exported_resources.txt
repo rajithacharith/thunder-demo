@@ -1,374 +1,5 @@
-# File: Basic_SMS_Authentication_Flow.yaml
-id: 019bec19-b794-75b4-9ba8-c9ee0ab538de
-handle: auth-flow-basic-sms
-name: Basic SMS Authentication Flow
-flowType: AUTHENTICATION
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: prompt_credentials
-  - id: prompt_credentials
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: send_sms
-  - id: send_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-    onSuccess: prompt_otp
-  - id: prompt_otp
-    type: PROMPT
-    prompts:
-      - inputs:
-          - ref: input_002
-            type: TEXT_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: action_001
-          nextNode: verify_sms
-  - id: verify_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-    onSuccess: auth_assert
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
-
----
-# File: Basic_SMS_Registration_Flow.yaml
-id: 019bec19-b794-7116-972e-5c6ade87eb19
-handle: auth-flow-basic-sms
-name: Basic SMS Registration Flow
-flowType: REGISTRATION
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: ut_res_node
-  - id: prompt_credentials
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: send_sms
-  - id: send_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-    onSuccess: prompt_otp
-  - id: prompt_otp
-    type: PROMPT
-    prompts:
-      - inputs:
-          - ref: input_002
-            type: TEXT_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: action_001
-          nextNode: verify_sms
-  - id: verify_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-    onSuccess: prov_node
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-  - id: prov_node
-    type: TASK_EXECUTION
-    executor:
-      name: ProvisioningExecutor
-    onSuccess: auth_assert
-  - id: ut_res_node
-    type: TASK_EXECUTION
-    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
-    executor:
-      name: UserTypeResolver
-    onSuccess: prompt_credentials
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
-
----
-# File: User_Onboarding_Flow.yaml
-id: 019bec19-b82e-7e65-81cc-db11bc765fb0
-handle: default-user-onboarding
-name: User Onboarding Flow
-flowType: USER_ONBOARDING
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: permission_validator
-  - id: permission_validator
-    type: TASK_EXECUTION
-    properties:
-      requiredScopes: ["system"]
-    executor:
-      name: PermissionValidator
-    onSuccess: user_type_resolver
-  - id: user_type_resolver
-    type: TASK_EXECUTION
-    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
-    executor:
-      name: UserTypeResolver
-    onSuccess: prompt_email
-  - id: prompt_email
-    type: PROMPT
-    meta: {"components":[{"id":"text_header_email","label":"User Email","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_prompt_email","label":"Email","placeholder":"Enter email","ref":"email","required":true,"type":"EMAIL_INPUT"},{"eventType":"SUBMIT","id":"action_submit_email","label":"Next","type":"ACTION","variant":"PRIMARY"}],"id":"block_email","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_prompt_email
-            type: EMAIL_INPUT
-            identifier: email
-            required: true
-        action:
-          ref: action_submit_email
-          nextNode: invite
-  - id: invite
-    type: TASK_EXECUTION
-    executor:
-      name: InviteExecutor
-    onSuccess: prompt_user_details
-  - id: prompt_user_details
-    type: PROMPT
-    meta: {"components":[{"id":"text_header_details","label":"User Details","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_prompt_username","label":"Username","placeholder":"Enter username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_prompt_given_name","label":"First Name","placeholder":"Enter first name","ref":"given_name","required":false,"type":"TEXT_INPUT"},{"id":"input_prompt_family_name","label":"Last Name","placeholder":"Enter last name","ref":"family_name","required":false,"type":"TEXT_INPUT"},{"id":"input_prompt_phone","label":"Phone Number","placeholder":"Enter phone number","ref":"phone_number","required":false,"type":"TEXT_INPUT"},{"eventType":"SUBMIT","id":"action_submit_details","label":"Next","type":"ACTION","variant":"PRIMARY"}],"id":"block_user_details","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_prompt_username
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_prompt_given_name
-            type: TEXT_INPUT
-            identifier: given_name
-            required: false
-          - ref: input_prompt_family_name
-            type: TEXT_INPUT
-            identifier: family_name
-            required: false
-          - ref: input_prompt_phone
-            type: TEXT_INPUT
-            identifier: phone_number
-            required: false
-        action:
-          ref: action_submit_details
-          nextNode: prompt_credential
-  - id: prompt_credential
-    type: PROMPT
-    meta: {"components":[{"id":"text_header_pwd","label":"Set Password","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"input_prompt_password","label":"Password","placeholder":"Enter password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_submit_pwd","label":"Set Password","type":"ACTION","variant":"PRIMARY"}],"id":"block_pwd","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_prompt_password
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_submit_pwd
-          nextNode: provisioning
-  - id: provisioning
-    type: TASK_EXECUTION
-    executor:
-      name: ProvisioningExecutor
-    onSuccess: end
-  - id: end
-    type: END
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
-
----
-# File: Develop_App_Authentication_Flow.yaml
-id: 019bec19-b8c8-710d-ab08-f58837aea9db
-handle: develop-app-flow
-name: Develop App Authentication Flow
-flowType: AUTHENTICATION
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: prompt_credentials
-  - id: prompt_credentials
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: authorization_check
-  - id: authorization_check
-    type: TASK_EXECUTION
-    executor:
-      name: AuthorizationExecutor
-    onSuccess: auth_assert
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
-
----
-# File: Develop_App_Registration_Flow.yaml
-id: 019bec19-b8c9-7250-b93b-255682cb3d90
-handle: develop-app-flow
-name: Develop App Registration Flow
-flowType: REGISTRATION
-activeVersion: 2
-nodes:
-  - id: start
-    type: START
-    onSuccess: user_type_resolver
-  - id: user_type_resolver
-    type: TASK_EXECUTION
-    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
-    executor:
-      name: UserTypeResolver
-    onSuccess: prompt_registration
-  - id: prompt_registration
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign Up","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"id":"input_003","label":"First Name","placeholder":"Enter your first name","ref":"firstName","required":true,"type":"TEXT_INPUT"},{"id":"input_004","label":"Last Name","placeholder":"Enter your last name","ref":"lastName","required":true,"type":"TEXT_INPUT"},{"id":"input_005","label":"Email Address","placeholder":"Enter your email address","ref":"email","required":true,"type":"EMAIL_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign Up","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-          - ref: input_003
-            type: TEXT_INPUT
-            identifier: firstName
-            required: true
-          - ref: input_004
-            type: TEXT_INPUT
-            identifier: lastName
-            required: true
-          - ref: input_005
-            type: EMAIL_INPUT
-            identifier: email
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: provisioning
-  - id: provisioning
-    type: TASK_EXECUTION
-    executor:
-      name: ProvisioningExecutor
-      inputs:
-        - ref: input_001
-          type: TEXT_INPUT
-          identifier: username
-          required: true
-        - ref: input_002
-          type: PASSWORD_INPUT
-          identifier: password
-          required: true
-        - ref: input_003
-          type: TEXT_INPUT
-          identifier: firstName
-          required: true
-        - ref: input_004
-          type: TEXT_INPUT
-          identifier: lastName
-          required: true
-        - ref: input_005
-          type: EMAIL_INPUT
-          identifier: email
-          required: true
-    onSuccess: auth_assert
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-createdAt: 2026-01-23 18:24:27
-updatedAt: 2026-01-23 18:24:27
-
----
 # File: Default_Basic_Authentication_Flow.yaml
-id: 019bec19-b76a-7d77-a8f4-f81b290fedaf
+id: 019bec22-db72-72cf-8769-260a999b5c15
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
@@ -410,12 +41,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:24:26
-updatedAt: 2026-01-23 18:24:26
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
 
 ---
 # File: Default_Basic_Registration_Flow.yaml
-id: 019bec19-b76a-768c-9607-ee22df2d4bd7
+id: 019bec22-db73-70ab-aae3-4acac8f448c1
 handle: default-basic-flow
 name: Default Basic Registration Flow
 flowType: REGISTRATION
@@ -504,5 +135,287 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:24:26
-updatedAt: 2026-01-23 18:24:27
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
+
+---
+# File: Basic_SMS_Authentication_Flow.yaml
+id: 019bec22-dba3-7a6c-826c-4ff88debcb70
+handle: auth-flow-basic-sms
+name: Basic SMS Authentication Flow
+flowType: AUTHENTICATION
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: prompt_credentials
+  - id: prompt_credentials
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_001
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_002
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+        action:
+          ref: action_001
+          nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
+    executor:
+      name: BasicAuthExecutor
+    onSuccess: send_sms
+  - id: send_sms
+    type: TASK_EXECUTION
+    properties:
+      senderId: "\u003csender-id\u003e"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: send
+    onSuccess: prompt_otp
+  - id: prompt_otp
+    type: PROMPT
+    prompts:
+      - inputs:
+          - ref: input_002
+            type: TEXT_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: action_001
+          nextNode: verify_sms
+  - id: verify_sms
+    type: TASK_EXECUTION
+    properties:
+      senderId: "\u003csender-id\u003e"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: verify
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
+
+---
+# File: Basic_SMS_Registration_Flow.yaml
+id: 019bec22-dba3-7d8c-b4c9-0dc909e66cc5
+handle: auth-flow-basic-sms
+name: Basic SMS Registration Flow
+flowType: REGISTRATION
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: ut_res_node
+  - id: prompt_credentials
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_001
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_002
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+        action:
+          ref: action_001
+          nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
+    executor:
+      name: BasicAuthExecutor
+    onSuccess: send_sms
+  - id: send_sms
+    type: TASK_EXECUTION
+    properties:
+      senderId: "\u003csender-id\u003e"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: send
+    onSuccess: prompt_otp
+  - id: prompt_otp
+    type: PROMPT
+    prompts:
+      - inputs:
+          - ref: input_002
+            type: TEXT_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: action_001
+          nextNode: verify_sms
+  - id: verify_sms
+    type: TASK_EXECUTION
+    properties:
+      senderId: "\u003csender-id\u003e"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: verify
+    onSuccess: prov_node
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+  - id: prov_node
+    type: TASK_EXECUTION
+    executor:
+      name: ProvisioningExecutor
+    onSuccess: auth_assert
+  - id: ut_res_node
+    type: TASK_EXECUTION
+    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
+    executor:
+      name: UserTypeResolver
+    onSuccess: prompt_credentials
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
+
+---
+# File: Develop_App_Authentication_Flow.yaml
+id: 019bec22-dc82-7750-96c1-a611671c3dff
+handle: develop-app-flow
+name: Develop App Authentication Flow
+flowType: AUTHENTICATION
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: prompt_credentials
+  - id: prompt_credentials
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_001
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_002
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+        action:
+          ref: action_001
+          nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
+    executor:
+      name: BasicAuthExecutor
+    onSuccess: authorization_check
+  - id: authorization_check
+    type: TASK_EXECUTION
+    executor:
+      name: AuthorizationExecutor
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26
+
+---
+# File: Develop_App_Registration_Flow.yaml
+id: 019bec22-dc83-77d2-bc66-551c77d11352
+handle: develop-app-flow
+name: Develop App Registration Flow
+flowType: REGISTRATION
+activeVersion: 2
+nodes:
+  - id: start
+    type: START
+    onSuccess: user_type_resolver
+  - id: user_type_resolver
+    type: TASK_EXECUTION
+    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
+    executor:
+      name: UserTypeResolver
+    onSuccess: prompt_registration
+  - id: prompt_registration
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"Sign Up","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"id":"input_003","label":"First Name","placeholder":"Enter your first name","ref":"firstName","required":true,"type":"TEXT_INPUT"},{"id":"input_004","label":"Last Name","placeholder":"Enter your last name","ref":"lastName","required":true,"type":"TEXT_INPUT"},{"id":"input_005","label":"Email Address","placeholder":"Enter your email address","ref":"email","required":true,"type":"EMAIL_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign Up","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_001
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+          - ref: input_002
+            type: PASSWORD_INPUT
+            identifier: password
+            required: true
+          - ref: input_003
+            type: TEXT_INPUT
+            identifier: firstName
+            required: true
+          - ref: input_004
+            type: TEXT_INPUT
+            identifier: lastName
+            required: true
+          - ref: input_005
+            type: EMAIL_INPUT
+            identifier: email
+            required: true
+        action:
+          ref: action_001
+          nextNode: basic_auth
+  - id: basic_auth
+    type: TASK_EXECUTION
+    executor:
+      name: BasicAuthExecutor
+    onSuccess: provisioning
+  - id: provisioning
+    type: TASK_EXECUTION
+    executor:
+      name: ProvisioningExecutor
+      inputs:
+        - ref: input_001
+          type: TEXT_INPUT
+          identifier: username
+          required: true
+        - ref: input_002
+          type: PASSWORD_INPUT
+          identifier: password
+          required: true
+        - ref: input_003
+          type: TEXT_INPUT
+          identifier: firstName
+          required: true
+        - ref: input_004
+          type: TEXT_INPUT
+          identifier: lastName
+          required: true
+        - ref: input_005
+          type: EMAIL_INPUT
+          identifier: email
+          required: true
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-23 18:34:26
+updatedAt: 2026-01-23 18:34:26

@@ -1,5 +1,5 @@
 # File: Custom_SMS_Sender.yaml
-id: 130d85ef-eada-4336-b9b4-21b9224be919
+id: b149f0f1-b657-4824-963c-4b4d4e4a98da
 name: Custom SMS Sender
 description: Sender for sending SMS messages using Webhook.io
 provider: custom
@@ -10,5 +10,4 @@ properties:
     value: {{.CUSTOM_SMS_SENDER_HTTP_METHOD}}
   - name: url
     value: {{.CUSTOM_SMS_SENDER_URL}}
-
 

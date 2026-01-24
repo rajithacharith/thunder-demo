@@ -1,9 +1,9 @@
 # File: Default_Basic_Authentication_Flow.yaml
-id: 019bec22-db72-72cf-8769-260a999b5c15
+id: 019bee7a-0e30-7e45-9c69-b8532819b239
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 2
+activeVersion: 3
 nodes:
   - id: start
     type: START
@@ -14,8 +14,8 @@ nodes:
       position:
         x: 62
         y: 330
-    onSuccess: view_06k7
-  - id: view_06k7
+    onSuccess: view_fb1u
+  - id: view_fb1u
     type: PROMPT
     layout:
       size:
@@ -24,21 +24,21 @@ nodes:
       position:
         x: 310
         y: 63
-    meta: {"components":[{"category":"DISPLAY","id":"text_dqbi","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_ss2j","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_5ghr","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_iirp","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_dm6z","resourceType":"ELEMENT","type":"BLOCK"}]}
+    meta: {"components":[{"category":"DISPLAY","id":"text_eefp","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_dla7","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_2yo6","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_pa96","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_v7x3","resourceType":"ELEMENT","type":"BLOCK"}]}
     prompts:
       - inputs:
-          - ref: text_input_ss2j
+          - ref: text_input_dla7
             type: TEXT_INPUT
             identifier: username
             required: true
-          - ref: password_input_5ghr
+          - ref: password_input_2yo6
             type: PASSWORD_INPUT
             identifier: password
             required: true
         action:
-          ref: action_iirp
-          nextNode: ID_0njf
-  - id: ID_0njf
+          ref: action_pa96
+          nextNode: ID_o64o
+  - id: ID_o64o
     type: TASK_EXECUTION
     layout:
       size:
@@ -50,90 +50,23 @@ nodes:
     executor:
       name: BasicAuthExecutor
       inputs:
-        - ref: text_input_ss2j
+        - ref: text_input_dla7
           type: TEXT_INPUT
           identifier: username
           required: true
-        - ref: password_input_5ghr
+        - ref: password_input_2yo6
           type: PASSWORD_INPUT
           identifier: password
           required: true
-    onSuccess: ID_p9iu
-  - id: ID_p9iu
-    type: TASK_EXECUTION
-    layout:
-      size:
-        width: 200
-        height: 113
-      position:
-        x: 1200
-        y: 291
-    properties:
-      senderId: "46791713-5adf-45b5-96c8-cc9e2dfc2fcb"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-      inputs:
-        - ref: otp_input_auup
-          type: OTP_INPUT
-          identifier: otp
-          required: true
-    onSuccess: ID_l8bf
-  - id: ID_l8bf
-    type: PROMPT
-    layout:
-      size:
-        width: 350
-        height: 556
-      position:
-        x: 1550
-        y: 69
-    meta: {"components":[{"category":"DISPLAY","id":"text_5znp","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"otp_input_auup","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_kkw0","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_29bn","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_muam","resourceType":"ELEMENT","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: otp_input_auup
-            type: OTP_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: action_kkw0
-          nextNode: ID_zc9e
-      - inputs:
-          - ref: otp_input_auup
-            type: OTP_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: resend_29bn
-          nextNode: ID_p9iu
-  - id: ID_zc9e
-    type: TASK_EXECUTION
-    layout:
-      size:
-        width: 200
-        height: 113
-      position:
-        x: 2050
-        y: 291
-    properties:
-      senderId: "46791713-5adf-45b5-96c8-cc9e2dfc2fcb"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-      inputs:
-        - ref: otp_input_auup
-          type: OTP_INPUT
-          identifier: otp
-          required: true
-    onSuccess: ID_lrly
-  - id: ID_lrly
+    onSuccess: ID_qq2p
+  - id: ID_qq2p
     type: TASK_EXECUTION
     layout:
       size:
         width: 244
         height: 113
       position:
-        x: 2400
+        x: 1200
         y: 291
     executor:
       name: AuthAssertExecutor
@@ -145,14 +78,14 @@ nodes:
         width: 85
         height: 34
       position:
-        x: 2800
+        x: 1600
         y: 330
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:50:07
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:37:55
 
 ---
 # File: Default_Basic_Registration_Flow.yaml
-id: 019bec22-db73-70ab-aae3-4acac8f448c1
+id: 019bee7a-0e30-76a7-80ed-c7c112cbab15
 handle: default-basic-flow
 name: Default Basic Registration Flow
 flowType: REGISTRATION
@@ -241,12 +174,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:34:26
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:28:55
 
 ---
 # File: Basic_SMS_Authentication_Flow.yaml
-id: 019bec22-dba3-7a6c-826c-4ff88debcb70
+id: 019bee7a-0e60-7ed8-a4aa-ee6d100e11c7
 handle: auth-flow-basic-sms
 name: Basic SMS Authentication Flow
 flowType: AUTHENTICATION
@@ -310,12 +243,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:34:26
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:28:55
 
 ---
 # File: Basic_SMS_Registration_Flow.yaml
-id: 019bec22-dba3-7d8c-b4c9-0dc909e66cc5
+id: 019bee7a-0e60-7281-af6f-341261013991
 handle: auth-flow-basic-sms
 name: Basic SMS Registration Flow
 flowType: REGISTRATION
@@ -390,12 +323,12 @@ nodes:
     executor:
       name: UserTypeResolver
     onSuccess: prompt_credentials
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:34:26
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:28:55
 
 ---
 # File: Develop_App_Authentication_Flow.yaml
-id: 019bec22-dc82-7750-96c1-a611671c3dff
+id: 019bee7a-0f38-7fdb-8754-12d3ea3bd964
 handle: develop-app-flow
 name: Develop App Authentication Flow
 flowType: AUTHENTICATION
@@ -437,12 +370,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:34:26
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:28:55
 
 ---
 # File: Develop_App_Registration_Flow.yaml
-id: 019bec22-dc83-77d2-bc66-551c77d11352
+id: 019bee7a-0f38-761f-b27f-3123ee519c9c
 handle: develop-app-flow
 name: Develop App Registration Flow
 flowType: REGISTRATION
@@ -523,12 +456,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-23 18:34:26
-updatedAt: 2026-01-23 18:34:26
+createdAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:28:55
 
 ---
 # File: Custom_SMS_Sender.yaml
-id: 46791713-5adf-45b5-96c8-cc9e2dfc2fcb
+id: acefe5a3-edaa-4224-b3a8-cfba5f781ca4
 name: Custom SMS Sender
 description: Sender for sending SMS messages using Webhook.io
 provider: custom

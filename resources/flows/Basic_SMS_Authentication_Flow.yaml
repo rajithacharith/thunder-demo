@@ -1,9 +1,9 @@
 # File: Basic_SMS_Authentication_Flow.yaml
-id: 019bee7a-0e60-7ed8-a4aa-ee6d100e11c7
+id: 019beea4-de4f-7078-84f4-2f28fac03c4c
 handle: auth-flow-basic-sms
 name: Basic SMS Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 4
+activeVersion: 1
 nodes:
   - id: start
     type: START
@@ -32,7 +32,7 @@ nodes:
   - id: send_sms
     type: TASK_EXECUTION
     properties:
-      senderId: "acefe5a3-edaa-4224-b3a8-cfba5f781ca4"
+      senderId: "\u003csender-id\u003e"
     executor:
       name: SMSOTPAuthExecutor
       mode: send
@@ -52,7 +52,7 @@ nodes:
   - id: verify_sms
     type: TASK_EXECUTION
     properties:
-      senderId: "acefe5a3-edaa-4224-b3a8-cfba5f781ca4"
+      senderId: "\u003csender-id\u003e"
     executor:
       name: SMSOTPAuthExecutor
       mode: verify
@@ -64,7 +64,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-24 05:28:55
-updatedAt: 2026-01-24 05:58:37
+createdAt: 2026-01-24 06:15:40
+updatedAt: 2026-01-24 06:15:40
 
 

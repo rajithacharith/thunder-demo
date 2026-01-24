@@ -3,14 +3,14 @@ id: 019bee7a-0e60-7ed8-a4aa-ee6d100e11c7
 handle: auth-flow-basic-sms
 name: Basic SMS Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 1
+activeVersion: 4
 nodes:
   - id: start
     type: START
     onSuccess: prompt_credentials
   - id: prompt_credentials
     type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"{{ t(elements:fields.password.label) }}","placeholder":"{{ t(elements:fields.password.placeholder) }}","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
     prompts:
       - inputs:
           - ref: input_001
@@ -32,17 +32,18 @@ nodes:
   - id: send_sms
     type: TASK_EXECUTION
     properties:
-      senderId: "\u003csender-id\u003e"
+      senderId: "acefe5a3-edaa-4224-b3a8-cfba5f781ca4"
     executor:
       name: SMSOTPAuthExecutor
       mode: send
     onSuccess: prompt_otp
   - id: prompt_otp
     type: PROMPT
+    meta: {"components":[{"category":"DISPLAY","id":"text_001","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"input_002","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_001","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_001","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_001","resourceType":"ELEMENT","type":"BLOCK"}]}
     prompts:
       - inputs:
           - ref: input_002
-            type: TEXT_INPUT
+            type: OTP_INPUT
             identifier: otp
             required: true
         action:
@@ -51,7 +52,7 @@ nodes:
   - id: verify_sms
     type: TASK_EXECUTION
     properties:
-      senderId: "\u003csender-id\u003e"
+      senderId: "acefe5a3-edaa-4224-b3a8-cfba5f781ca4"
     executor:
       name: SMSOTPAuthExecutor
       mode: verify
@@ -64,6 +65,6 @@ nodes:
   - id: end
     type: END
 createdAt: 2026-01-24 05:28:55
-updatedAt: 2026-01-24 05:28:55
+updatedAt: 2026-01-24 05:58:37
 
 

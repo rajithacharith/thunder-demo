@@ -15,7 +15,7 @@ RESPONSE=$(curl --location 'https://localhost:8090/export' -k \
 --header "Authorization: Bearer ${ASSERTION}" \
 --silent \
 --data "{
-    \"flows\": [\"019bdaad-a516-75c3-95a7-e5926478be77\", \"019bdaad-a516-71ab-b4f7-912c43bc213d\"],
+    \"flows\": [\"*\"],
     \"notification_senders\": [\"*\"],
     \"options\": {
         \"include_metadata\": true,

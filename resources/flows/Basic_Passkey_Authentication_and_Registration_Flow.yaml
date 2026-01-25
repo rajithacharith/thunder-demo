@@ -1,7 +1,7 @@
 # File: Basic__Passkey_Authentication_and_Registration_Flow.yaml
 id: 019bf5b6-b5ff-7bd7-bb4f-76b553d02cdb
 handle: default-basic-passkey-flow
-name: Basic + Passkey Authentication and Registration Flow
+name: Basic + Passkey Authentication and Registration Flow test
 flowType: AUTHENTICATION
 activeVersion: 1
 nodes:

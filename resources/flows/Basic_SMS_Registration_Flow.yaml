@@ -1,5 +1,5 @@
 # File: Basic_SMS_Registration_Flow.yaml
-id: 019bf5b6-b62e-72fb-a0dc-15a446de19f6
+id: 019bf5e1-2fe7-7fe7-9b26-09f4ad2674df
 handle: auth-flow-basic-sms
 name: Basic SMS Registration Flow
 flowType: REGISTRATION
@@ -75,7 +75,7 @@ nodes:
     executor:
       name: UserTypeResolver
     onSuccess: prompt_credentials
-createdAt: 2026-01-25 15:12:30
-updatedAt: 2026-01-25 15:12:30
+createdAt: 2026-01-25 15:58:54
+updatedAt: 2026-01-25 15:58:54
 
 

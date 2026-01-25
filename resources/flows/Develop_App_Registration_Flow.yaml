@@ -1,5 +1,5 @@
 # File: Develop_App_Registration_Flow.yaml
-id: 019bf5b6-b7e9-7b60-892d-9e4b4d1c8144
+id: 019bf5e1-30b4-77b6-a8be-7c88eff9211e
 handle: develop-app-flow
 name: Develop App Registration Flow
 flowType: REGISTRATION
@@ -80,7 +80,6 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 15:12:31
-updatedAt: 2026-01-25 15:12:31
-
+createdAt: 2026-01-25 15:58:54
+updatedAt: 2026-01-25 15:58:54
 

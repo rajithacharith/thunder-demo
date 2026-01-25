@@ -1,0 +1,56 @@
+# File: Passkey_Only_Authentication_Flow.yaml
+id: 019bf5b6-b65e-7959-abef-f59f79782d55
+handle: passkey-authentication-flow
+name: Passkey Only Authentication Flow
+flowType: AUTHENTICATION
+activeVersion: 1
+nodes:
+  - id: start
+    type: START
+    onSuccess: prompt_identifier
+  - id: prompt_identifier
+    type: PROMPT
+    meta: {"components":[{"id":"text_001","label":"{{ t(signin:heading) }}","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"{{ t(elements:fields.username.label) }}","placeholder":"{{ t(elements:fields.username.placeholder) }}","ref":"username","required":true,"type":"TEXT_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: input_001
+            type: TEXT_INPUT
+            identifier: username
+            required: true
+        action:
+          ref: action_001
+          nextNode: identity_resolver
+  - id: identity_resolver
+    type: TASK_EXECUTION
+    executor:
+      name: IdentityResolver
+    onSuccess: passkey_challenge
+    onFailure: prompt_identifier
+  - id: passkey_challenge
+    type: TASK_EXECUTION
+    properties:
+      relyingPartyId: "localhost"
+      relyingPartyName: "Thunder"
+    executor:
+      name: PasskeyAuthExecutor
+      mode: challenge
+    onSuccess: passkey_verify
+    onFailure: prompt_identifier
+  - id: passkey_verify
+    type: TASK_EXECUTION
+    executor:
+      name: PasskeyAuthExecutor
+      mode: verify
+    onSuccess: auth_assert
+    onFailure: prompt_identifier
+  - id: auth_assert
+    type: TASK_EXECUTION
+    executor:
+      name: AuthAssertExecutor
+    onSuccess: end
+  - id: end
+    type: END
+createdAt: 2026-01-25 15:12:30
+updatedAt: 2026-01-25 15:12:30
+
+

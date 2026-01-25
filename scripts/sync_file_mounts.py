@@ -359,7 +359,20 @@ class FileMountSynchronizer:
         rel_path = Path(file_path).relative_to('resources')
         parts = list(rel_path.parts)
         parts[-1] = Path(parts[-1]).stem  # Remove .yaml extension
-        return 'thunder-' + '-'.join(parts)
+        name = 'thunder-' + '-'.join(parts)
+        
+        # Sanitize to comply with Kubernetes naming conventions:
+        # - Replace consecutive underscores with single hyphen
+        # - Convert to lowercase
+        # - Only allow alphanumeric characters and hyphens
+        import re
+        name = re.sub(r'_+', '-', name)  # Replace one or more underscores with single hyphen
+        name = name.lower()
+        name = re.sub(r'[^a-z0-9-]', '-', name)  # Replace invalid chars with hyphen
+        name = re.sub(r'-+', '-', name)  # Replace consecutive hyphens with single hyphen
+        name = name.strip('-')  # Remove leading/trailing hyphens
+        
+        return name
     
     def file_path_to_mount_path(self, file_path: str) -> str:
         """Convert file path to mount path"""

@@ -3,45 +3,151 @@ id: 019bf65b-f521-7de9-9033-a6008002df6f
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 1
+activeVersion: 2
 nodes:
   - id: start
     type: START
-    onSuccess: prompt_credentials
-  - id: prompt_credentials
+    layout:
+      size:
+        width: 101
+        height: 34
+      position:
+        x: 62
+        y: 330
+    onSuccess: view_3eyu
+  - id: view_3eyu
     type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    layout:
+      size:
+        width: 350
+        height: 531
+      position:
+        x: 310
+        y: 63
+    meta: {"components":[{"category":"DISPLAY","id":"text_jjmc","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_ew3r","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_k0tk","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_pdbf","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_mq8a","resourceType":"ELEMENT","type":"BLOCK"}]}
     prompts:
       - inputs:
-          - ref: input_001
+          - ref: text_input_ew3r
             type: TEXT_INPUT
             identifier: username
             required: true
-          - ref: input_002
+          - ref: password_input_k0tk
             type: PASSWORD_INPUT
             identifier: password
             required: true
         action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
+          ref: action_pdbf
+          nextNode: ID_8y4e
+  - id: ID_8y4e
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 217
+        height: 113
+      position:
+        x: 820
+        y: 291
     executor:
       name: BasicAuthExecutor
-    onSuccess: authorization_check
-  - id: authorization_check
+      inputs:
+        - ref: text_input_ew3r
+          type: TEXT_INPUT
+          identifier: username
+          required: true
+        - ref: password_input_k0tk
+          type: PASSWORD_INPUT
+          identifier: password
+          required: true
+    onSuccess: ID_e2t7
+  - id: ID_e2t7
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 1200
+        y: 291
+    properties:
+      senderId: "92bea1d8-eba4-402f-b941-d5ebf6792f9b"
     executor:
-      name: AuthorizationExecutor
-    onSuccess: auth_assert
-  - id: auth_assert
+      name: SMSOTPAuthExecutor
+      mode: send
+      inputs:
+        - ref: otp_input_y0cf
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_qg93
+  - id: ID_qg93
+    type: PROMPT
+    layout:
+      size:
+        width: 350
+        height: 556
+      position:
+        x: 1550
+        y: 69
+    meta: {"components":[{"category":"DISPLAY","id":"text_3c76","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"otp_input_y0cf","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_n5jz","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_8ynd","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_5h2q","resourceType":"ELEMENT","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: otp_input_y0cf
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: action_n5jz
+          nextNode: ID_z9kp
+      - inputs:
+          - ref: otp_input_y0cf
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: resend_8ynd
+          nextNode: ID_e2t7
+  - id: ID_z9kp
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 2050
+        y: 291
+    properties:
+      senderId: "92bea1d8-eba4-402f-b941-d5ebf6792f9b"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: verify
+      inputs:
+        - ref: otp_input_y0cf
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_gcy1
+  - id: ID_gcy1
+    type: TASK_EXECUTION
+    layout:
+      size:
+        width: 244
+        height: 113
+      position:
+        x: 2400
+        y: 291
     executor:
       name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
+    onSuccess: END
+  - id: END
     type: END
+    layout:
+      size:
+        width: 85
+        height: 34
+      position:
+        x: 2800
+        y: 330
 createdAt: 2026-01-25 18:13:00
-updatedAt: 2026-01-25 18:13:00
+updatedAt: 2026-01-25 18:16:55
 
 

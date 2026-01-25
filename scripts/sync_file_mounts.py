@@ -191,6 +191,8 @@ class ChoreoAPIClient:
         
         response = self.session.post(url, params=self._get_query_params(), json=payload)
         logger.info(f"Response status: {response.status_code}")
+        if not response.ok:
+            logger.error(f"Error response body: {response.text}")
         response.raise_for_status()
         
         response_data = response.json()
@@ -229,6 +231,8 @@ class ChoreoAPIClient:
         
         response = self.session.put(url, params=self._get_query_params(), json=payload)
         logger.info(f"Response status: {response.status_code}")
+        if not response.ok:
+            logger.error(f"Error response body: {response.text}")
         response.raise_for_status()
         
         response_data = response.json()
@@ -270,6 +274,8 @@ class ChoreoAPIClient:
         
         response = self.session.post(url, params=self._get_query_params(), json=payload)
         logger.info(f"Response status: {response.status_code}")
+        if not response.ok:
+            logger.error(f"Error response body: {response.text}")
         response.raise_for_status()
         
         response_data = response.json()

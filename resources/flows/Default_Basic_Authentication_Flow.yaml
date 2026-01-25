@@ -1,7 +1,7 @@
 # File: Default_Basic_Authentication_Flow.yaml
 id: 019bf600-b29f-70ff-9b4e-962ce0748a16
 handle: default-basic-flow
-name: Default Basic Authentication Flow
+name: Default Basic Authentication Flow test
 flowType: AUTHENTICATION
 activeVersion: 1
 nodes:

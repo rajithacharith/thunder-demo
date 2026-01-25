@@ -1,5 +1,5 @@
 # File: Default_Basic_Authentication_Flow.yaml
-id: 019bf5e1-2fbe-7eed-87de-dd5826313ef0
+id: 019bf600-b29f-70ff-9b4e-962ce0748a16
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
@@ -41,12 +41,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
+createdAt: 2026-01-25 16:33:19
+updatedAt: 2026-01-25 16:33:19
 
 ---
 # File: Default_Basic_Registration_Flow.yaml
-id: 019bf5e1-2fbe-713f-b7a0-4936e4219895
+id: 019bf600-b2a0-7a39-a152-5e2072fe53ec
 handle: default-basic-flow
 name: Default Basic Registration Flow
 flowType: REGISTRATION
@@ -135,163 +135,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
-
----
-# File: Basic_SMS_Authentication_Flow.yaml
-id: 019bf5e1-2fe6-723b-9bff-826fd628e514
-handle: auth-flow-basic-sms
-name: Basic SMS Authentication Flow
-flowType: AUTHENTICATION
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: prompt_credentials
-  - id: prompt_credentials
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: send_sms
-  - id: send_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-    onSuccess: prompt_otp
-  - id: prompt_otp
-    type: PROMPT
-    meta: {"components":[{"category":"DISPLAY","id":"text_001","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"input_002","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_001","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_001","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_001","resourceType":"ELEMENT","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_002
-            type: OTP_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: action_001
-          nextNode: verify_sms
-  - id: verify_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-    onSuccess: auth_assert
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
-
----
-# File: Basic_SMS_Registration_Flow.yaml
-id: 019bf5e1-2fe7-7fe7-9b26-09f4ad2674df
-handle: auth-flow-basic-sms
-name: Basic SMS Registration Flow
-flowType: REGISTRATION
-activeVersion: 1
-nodes:
-  - id: start
-    type: START
-    onSuccess: ut_res_node
-  - id: prompt_credentials
-    type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_001
-            type: TEXT_INPUT
-            identifier: username
-            required: true
-          - ref: input_002
-            type: PASSWORD_INPUT
-            identifier: password
-            required: true
-        action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
-    type: TASK_EXECUTION
-    executor:
-      name: BasicAuthExecutor
-    onSuccess: send_sms
-  - id: send_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: send
-    onSuccess: prompt_otp
-  - id: prompt_otp
-    type: PROMPT
-    meta: {"components":[{"category":"DISPLAY","id":"text_001","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"input_002","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_001","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_001","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_001","resourceType":"ELEMENT","type":"BLOCK"}]}
-    prompts:
-      - inputs:
-          - ref: input_002
-            type: OTP_INPUT
-            identifier: otp
-            required: true
-        action:
-          ref: action_001
-          nextNode: verify_sms
-  - id: verify_sms
-    type: TASK_EXECUTION
-    properties:
-      senderId: "\u003csender-id\u003e"
-    executor:
-      name: SMSOTPAuthExecutor
-      mode: verify
-    onSuccess: prov_node
-  - id: auth_assert
-    type: TASK_EXECUTION
-    executor:
-      name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
-    type: END
-  - id: prov_node
-    type: TASK_EXECUTION
-    executor:
-      name: ProvisioningExecutor
-    onSuccess: auth_assert
-  - id: ut_res_node
-    type: TASK_EXECUTION
-    meta: {"components":[{"id":"usertype_heading","label":"{{ t(signup:heading) }}","type":"TEXT","variant":"HEADING_2"},{"components":[{"id":"usertype_input","label":"{{ t(elements:fields.usertype.label) }}","placeholder":"{{ t(elements:fields.usertype.placeholder) }}","ref":"userType","required":true,"type":"SELECT"},{"eventType":"SUBMIT","id":"usertype_submit","label":"{{ t(elements:buttons.submit.text) }}","type":"ACTION","variant":"PRIMARY"}],"id":"usertype_block","type":"BLOCK"}]}
-    executor:
-      name: UserTypeResolver
-    onSuccess: prompt_credentials
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
+createdAt: 2026-01-25 16:33:19
+updatedAt: 2026-01-25 16:33:19
 
 ---
 # File: Develop_App_Authentication_Flow.yaml
-id: 019bf5e1-30b4-7347-8437-5ab6edb6ce26
+id: 019bf600-b350-7684-bd12-2c5cb51c5656
 handle: develop-app-flow
 name: Develop App Authentication Flow
 flowType: AUTHENTICATION
@@ -333,12 +182,12 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
+createdAt: 2026-01-25 16:33:19
+updatedAt: 2026-01-25 16:33:19
 
 ---
 # File: Develop_App_Registration_Flow.yaml
-id: 019bf5e1-30b4-77b6-a8be-7c88eff9211e
+id: 019bf600-b351-7b36-aba9-b29c5be8d505
 handle: develop-app-flow
 name: Develop App Registration Flow
 flowType: REGISTRATION
@@ -419,5 +268,5 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 15:58:54
-updatedAt: 2026-01-25 15:58:54
+createdAt: 2026-01-25 16:33:19
+updatedAt: 2026-01-25 16:33:19

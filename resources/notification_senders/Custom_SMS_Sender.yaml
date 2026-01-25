@@ -1,0 +1,14 @@
+# File: Custom_SMS_Sender.yaml
+id: f81901f1-7db6-4416-acbd-4c0352b5f3c1
+name: Custom SMS Sender
+description: Sender for sending SMS messages using Webhook.io
+provider: custom
+properties:
+  - name: content_type
+    value: {{.CUSTOM_SMS_SENDER_CONTENT_TYPE}}
+  - name: http_method
+    value: {{.CUSTOM_SMS_SENDER_HTTP_METHOD}}
+  - name: url
+    value: {{.CUSTOM_SMS_SENDER_URL}}
+
+

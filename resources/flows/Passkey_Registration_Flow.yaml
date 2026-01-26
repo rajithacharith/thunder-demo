@@ -1,9 +1,9 @@
 # File: Passkey_Registration_Flow.yaml
-id: 019bf8ca-c0b7-7dc6-9789-9369301c61a9
+id: 019bf933-37db-770c-ad64-e238277c0acb
 handle: passkey_registration_flow
 name: Passkey Registration Flow
 flowType: REGISTRATION
-activeVersion: 5
+activeVersion: 1
 nodes:
   - id: start
     type: START
@@ -59,7 +59,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-26 05:33:15
-updatedAt: 2026-01-26 05:59:25
+createdAt: 2026-01-26 07:27:22
+updatedAt: 2026-01-26 07:27:22
 
 

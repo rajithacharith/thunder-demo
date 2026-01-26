@@ -1,9 +1,9 @@
 # File: Passkey_Only_Authentication_Flow.yaml
-id: 019bf8ca-bffb-74fe-ba86-7063f3f76a5a
+id: 019bf933-372a-7583-973f-2954c560e654
 handle: passkey-authentication-flow
 name: Passkey Only Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 5
+activeVersion: 1
 nodes:
   - id: start
     type: START
@@ -50,7 +50,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-26 05:33:15
-updatedAt: 2026-01-26 05:59:24
+createdAt: 2026-01-26 07:27:21
+updatedAt: 2026-01-26 07:27:21
 
 

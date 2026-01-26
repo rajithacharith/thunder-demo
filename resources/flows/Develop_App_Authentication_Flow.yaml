@@ -1,9 +1,9 @@
 # File: Develop_App_Authentication_Flow.yaml
-id: 019bf88c-9b26-7e03-89bf-a933b042cd22
+id: 019bf933-38ad-7664-bd20-e67d95a281a0
 handle: develop-app-flow
 name: Develop App Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 8
+activeVersion: 1
 nodes:
   - id: start
     type: START
@@ -41,7 +41,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-26 04:25:22
-updatedAt: 2026-01-26 05:59:25
+createdAt: 2026-01-26 07:27:22
+updatedAt: 2026-01-26 07:27:22
 
 

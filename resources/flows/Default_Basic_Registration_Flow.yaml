@@ -1,5 +1,5 @@
 # File: Default_Basic_Registration_Flow.yaml
-id: 019bf65b-f521-7846-abf1-70bca9f0c607
+id: 019bf88c-9a1a-76fd-8557-8eeec16c0917
 handle: default-basic-flow
 name: Default Basic Registration Flow
 flowType: REGISTRATION
@@ -88,7 +88,7 @@ nodes:
     onSuccess: end
   - id: end
     type: END
-createdAt: 2026-01-25 18:13:00
-updatedAt: 2026-01-25 18:13:00
+createdAt: 2026-01-26 04:25:22
+updatedAt: 2026-01-26 04:25:22
 
 

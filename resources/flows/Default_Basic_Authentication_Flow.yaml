@@ -1,86 +1,47 @@
 # File: Default_Basic_Authentication_Flow.yaml
-id: 019bf65b-f521-7de9-9033-a6008002df6f
+id: 019bf88c-9a19-77c0-99f5-26da2750c4fe
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 3
+activeVersion: 1
 nodes:
   - id: start
     type: START
-    layout:
-      size:
-        width: 101
-        height: 34
-      position:
-        x: 62
-        y: 87
-    onSuccess: view_grst
-  - id: view_grst
+    onSuccess: prompt_credentials
+  - id: prompt_credentials
     type: PROMPT
-    layout:
-      size:
-        width: 350
-        height: 620
-      position:
-        x: 310
-        y: -206
-    meta: {"components":[{"category":"DISPLAY","id":"text_4bqq","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_b7xi","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_qoxp","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_lh2x","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"DISPLAY","id":"rich_text_7b1m","label":"\u003cp class=\"rich-text-paragraph\"\u003e\u003cspan class=\"rich-text-pre-wrap\"\u003eDon't have an account? \u003c/span\u003e\u003ca href=\"{{application.selfRegisterUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"rich-text-link\"\u003e\u003cspan class=\"rich-text-pre-wrap\"\u003eSign up\u003c/span\u003e\u003c/a\u003e\u003c/p\u003e","resourceType":"ELEMENT","type":"RICH_TEXT"}],"id":"block_4k6b","resourceType":"ELEMENT","type":"BLOCK"}]}
+    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
     prompts:
       - inputs:
-          - ref: text_input_b7xi
+          - ref: input_001
             type: TEXT_INPUT
             identifier: username
             required: true
-          - ref: password_input_qoxp
+          - ref: input_002
             type: PASSWORD_INPUT
             identifier: password
             required: true
         action:
-          ref: action_lh2x
-          nextNode: ID_u862
-  - id: ID_u862
+          ref: action_001
+          nextNode: basic_auth
+  - id: basic_auth
     type: TASK_EXECUTION
-    layout:
-      size:
-        width: 217
-        height: 113
-      position:
-        x: 820
-        y: 108
     executor:
       name: BasicAuthExecutor
-      inputs:
-        - ref: text_input_b7xi
-          type: TEXT_INPUT
-          identifier: username
-          required: true
-        - ref: password_input_qoxp
-          type: PASSWORD_INPUT
-          identifier: password
-          required: true
-    onSuccess: ID_qpay
-  - id: ID_qpay
+    onSuccess: authorization_check
+  - id: authorization_check
     type: TASK_EXECUTION
-    layout:
-      size:
-        width: 244
-        height: 113
-      position:
-        x: 1234
-        y: 108
+    executor:
+      name: AuthorizationExecutor
+    onSuccess: auth_assert
+  - id: auth_assert
+    type: TASK_EXECUTION
     executor:
       name: AuthAssertExecutor
-    onSuccess: END
-  - id: END
+    onSuccess: end
+  - id: end
     type: END
-    layout:
-      size:
-        width: 85
-        height: 34
-      position:
-        x: 1650
-        y: 147
-createdAt: 2026-01-25 18:13:00
-updatedAt: 2026-01-26 04:15:29
+createdAt: 2026-01-26 04:25:22
+updatedAt: 2026-01-26 04:25:22
 
 

@@ -11,3 +11,4 @@ properties:
   - name: url
     value: {{.CUSTOM_SMS_SENDER_URL}}
 
+

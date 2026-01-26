@@ -3,7 +3,7 @@ id: 019bf88c-9b26-7e03-89bf-a933b042cd22
 handle: develop-app-flow
 name: Develop App Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 1
+activeVersion: 8
 nodes:
   - id: start
     type: START
@@ -42,6 +42,6 @@ nodes:
   - id: end
     type: END
 createdAt: 2026-01-26 04:25:22
-updatedAt: 2026-01-26 04:25:22
+updatedAt: 2026-01-26 05:59:25
 
 

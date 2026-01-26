@@ -3,7 +3,7 @@ id: 019bf88c-9a1a-76fd-8557-8eeec16c0917
 handle: default-basic-flow
 name: Default Basic Registration Flow
 flowType: REGISTRATION
-activeVersion: 2
+activeVersion: 9
 nodes:
   - id: start
     type: START
@@ -89,6 +89,6 @@ nodes:
   - id: end
     type: END
 createdAt: 2026-01-26 04:25:22
-updatedAt: 2026-01-26 04:25:22
+updatedAt: 2026-01-26 05:59:25
 
 

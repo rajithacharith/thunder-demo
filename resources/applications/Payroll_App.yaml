@@ -2,8 +2,8 @@
 id: d2e863d8-9bb2-4a66-b661-3d53e4db6611
 name: Payroll App
 description: Sample Payroll Application with Thunder authentication
-auth_flow_graph_id: 019bf65b-f521-7de9-9033-a6008002df6f
-registration_flow_graph_id: 019bf65b-f521-7846-abf1-70bca9f0c607
+auth_flow_graph_id: 19bf88c-9a19-77c0-99f5-26da2750c4fe
+registration_flow_graph_id: 019bf88c-9a1a-76fd-8557-8eeec16c0917
 is_registration_flow_enabled: true
 token:
   issuer: https://localhost:8090

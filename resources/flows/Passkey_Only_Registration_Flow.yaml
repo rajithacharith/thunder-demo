@@ -1,5 +1,5 @@
 # File: Passkey_Only_Registration_Flow.yaml
-id: 019bf8ca-bffc-755a-a7e0-e4ebc551d079
+id: 019bf933-3731-75de-93c0-a1d6b9fb5050
 handle: passkey-authentication-flow
 name: Passkey Only Registration Flow
 flowType: REGISTRATION
@@ -61,7 +61,6 @@ nodes:
     executor:
       name: UserTypeResolver
     onSuccess: prompt_identifier
-createdAt: 2026-01-26 05:33:15
-updatedAt: 2026-01-26 05:33:15
-
+createdAt: 2026-01-26 07:27:21
+updatedAt: 2026-01-26 07:27:21
 

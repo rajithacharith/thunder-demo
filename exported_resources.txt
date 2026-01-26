@@ -1,3 +1,17 @@
+# File: Custom_SMS_Sender.yaml
+id: 95ca65d2-e2f3-4026-a7d8-1d4a81c9971e
+name: Custom SMS Sender
+description: Sender for sending SMS messages using Webhook.io
+provider: custom
+properties:
+  - name: content_type
+    value: {{.CUSTOM_SMS_SENDER_CONTENT_TYPE}}
+  - name: http_method
+    value: {{.CUSTOM_SMS_SENDER_HTTP_METHOD}}
+  - name: url
+    value: {{.CUSTOM_SMS_SENDER_URL}}
+
+---
 # File: Passkey_Registration_Flow.yaml
 id: 019bf933-37db-770c-ad64-e238277c0acb
 handle: passkey_registration_flow
@@ -38,10 +52,10 @@ nodes:
   - id: passkey_reg_start
     type: TASK_EXECUTION
     properties:
-      attestation: "direct"
       authenticatorSelection: {"authenticatorAttachment":"platform","requireResidentKey":true,"residentKey":"required","userVerification":"required"}
       relyingPartyId: "localhost"
       relyingPartyName: "Thunder"
+      attestation: "direct"
     executor:
       name: PasskeyAuthExecutor
       mode: register_start
@@ -201,46 +215,152 @@ id: 019bf933-36d7-702f-941b-5dbb9776f55a
 handle: default-basic-flow
 name: Default Basic Authentication Flow
 flowType: AUTHENTICATION
-activeVersion: 1
+activeVersion: 2
 nodes:
   - id: start
     type: START
-    onSuccess: prompt_credentials
-  - id: prompt_credentials
+    layout:
+      size:
+        width: 101
+        height: 34
+      position:
+        x: 62
+        y: 330
+    onSuccess: view_8kk4
+  - id: view_8kk4
     type: PROMPT
-    meta: {"components":[{"id":"text_001","label":"Sign In","type":"TEXT","variant":"HEADING_1"},{"components":[{"id":"input_001","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"type":"TEXT_INPUT"},{"id":"input_002","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"type":"PASSWORD_INPUT"},{"eventType":"SUBMIT","id":"action_001","label":"Sign In","type":"ACTION","variant":"PRIMARY"}],"id":"block_001","type":"BLOCK"}]}
+    layout:
+      size:
+        width: 350
+        height: 531
+      position:
+        x: 310
+        y: 63
+    meta: {"components":[{"category":"DISPLAY","id":"text_rxhm","label":"Sign In","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"text_input_6414","inputType":"text","label":"Username","placeholder":"Enter your username","ref":"username","required":true,"resourceType":"ELEMENT","type":"TEXT_INPUT"},{"category":"FIELD","hint":"","id":"password_input_khlr","inputType":"password","label":"Password","placeholder":"Enter your password","ref":"password","required":true,"resourceType":"ELEMENT","type":"PASSWORD_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_rpue","label":"Sign In","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"}],"id":"block_sx3d","resourceType":"ELEMENT","type":"BLOCK"}]}
     prompts:
       - inputs:
-          - ref: input_001
+          - ref: text_input_6414
             type: TEXT_INPUT
             identifier: username
             required: true
-          - ref: input_002
+          - ref: password_input_khlr
             type: PASSWORD_INPUT
             identifier: password
             required: true
         action:
-          ref: action_001
-          nextNode: basic_auth
-  - id: basic_auth
+          ref: action_rpue
+          nextNode: ID_mhez
+  - id: ID_mhez
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 217
+        height: 113
+      position:
+        x: 820
+        y: 291
     executor:
       name: BasicAuthExecutor
-    onSuccess: authorization_check
-  - id: authorization_check
+      inputs:
+        - ref: text_input_6414
+          type: TEXT_INPUT
+          identifier: username
+          required: true
+        - ref: password_input_khlr
+          type: PASSWORD_INPUT
+          identifier: password
+          required: true
+    onSuccess: ID_rzt4
+  - id: ID_rzt4
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 1200
+        y: 291
+    properties:
+      senderId: "95ca65d2-e2f3-4026-a7d8-1d4a81c9971e"
     executor:
-      name: AuthorizationExecutor
-    onSuccess: auth_assert
-  - id: auth_assert
+      name: SMSOTPAuthExecutor
+      mode: send
+      inputs:
+        - ref: otp_input_kvc5
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_2f59
+  - id: ID_2f59
+    type: PROMPT
+    layout:
+      size:
+        width: 350
+        height: 556
+      position:
+        x: 1550
+        y: 69
+    meta: {"components":[{"category":"DISPLAY","id":"text_kmay","label":"Verify OTP","resourceType":"ELEMENT","type":"TEXT","variant":"HEADING_3"},{"category":"BLOCK","components":[{"category":"FIELD","hint":"","id":"otp_input_kvc5","inputType":"text","label":"Enter the OTP code","placeholder":"","ref":"otp","required":true,"resourceType":"ELEMENT","type":"OTP_INPUT"},{"category":"ACTION","eventType":"SUBMIT","id":"action_z705","label":"Verify","resourceType":"ELEMENT","type":"ACTION","variant":"PRIMARY"},{"category":"ACTION","eventType":"SUBMIT","id":"resend_1wrm","label":"Resend OTP","resourceType":"ELEMENT","type":"RESEND"}],"id":"block_m115","resourceType":"ELEMENT","type":"BLOCK"}]}
+    prompts:
+      - inputs:
+          - ref: otp_input_kvc5
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: action_z705
+          nextNode: ID_isum
+      - inputs:
+          - ref: otp_input_kvc5
+            type: OTP_INPUT
+            identifier: otp
+            required: true
+        action:
+          ref: resend_1wrm
+          nextNode: ID_rzt4
+  - id: ID_isum
     type: TASK_EXECUTION
+    layout:
+      size:
+        width: 200
+        height: 113
+      position:
+        x: 2050
+        y: 291
+    properties:
+      senderId: "95ca65d2-e2f3-4026-a7d8-1d4a81c9971e"
+    executor:
+      name: SMSOTPAuthExecutor
+      mode: verify
+      inputs:
+        - ref: otp_input_kvc5
+          type: OTP_INPUT
+          identifier: otp
+          required: true
+    onSuccess: ID_adt5
+  - id: ID_adt5
+    type: TASK_EXECUTION
+    layout:
+      size:
+        width: 244
+        height: 113
+      position:
+        x: 2400
+        y: 291
     executor:
       name: AuthAssertExecutor
-    onSuccess: end
-  - id: end
+    onSuccess: END
+  - id: END
     type: END
+    layout:
+      size:
+        width: 85
+        height: 34
+      position:
+        x: 2800
+        y: 330
 createdAt: 2026-01-26 07:27:21
-updatedAt: 2026-01-26 07:27:21
+updatedAt: 2026-01-26 09:12:53
 
 ---
 # File: Default_Basic_Registration_Flow.yaml
@@ -368,8 +488,8 @@ nodes:
   - id: passkey_challenge
     type: TASK_EXECUTION
     properties:
-      relyingPartyId: "localhost"
       relyingPartyName: "Thunder"
+      relyingPartyId: "localhost"
     executor:
       name: PasskeyAuthExecutor
       mode: challenge

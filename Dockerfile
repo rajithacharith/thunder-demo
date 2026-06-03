@@ -54,7 +54,7 @@ USER 10001
 # Expose the server port
 EXPOSE 8090
 
-RUN ls -R
+RUN pwd
 
 # Use the Choreo startup script
 CMD ["start.sh"]

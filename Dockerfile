@@ -54,5 +54,7 @@ USER 10001
 # Expose the server port
 EXPOSE 8090
 
+RUN ls -R
+
 # Use the Choreo startup script
 CMD ["/opt/thunder/start.sh"]

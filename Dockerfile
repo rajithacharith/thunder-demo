@@ -57,4 +57,4 @@ EXPOSE 8090
 RUN ls -R
 
 # Use the Choreo startup script
-CMD ["/opt/thunder/start.sh"]
+CMD ["start.sh"]

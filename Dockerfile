@@ -32,10 +32,10 @@ RUN apk add --no-cache \
     yq
 
 # Create directory for Choreo-specific configurations
-RUN mkdir -p /opt/thunder/choreo-config
+RUN mkdir -p /opt/thunderid/choreo-config
 
 # Copy deployment configuration
-COPY deployment.yaml /opt/thunder/repository/conf/deployment.yaml
+COPY deployment.yaml /opt/thunderid/repository/conf/deployment.yaml
 
 # Environment variables for Choreo deployment
 # These can be overridden at runtime via Helm chart or Choreo platform
@@ -45,8 +45,8 @@ ENV SERVER_HOST="0.0.0.0" \
     DATABASE_TYPE="sqlite"
 
 # Ensure proper permissions for all thunder files and directories
-RUN chown -R 10001:10001 /opt/thunder && \
-    chmod -R u+rwX,g+rX,o+rX /opt/thunder
+RUN chown -R 10001:10001 /opt/thunderid && \
+    chmod -R u+rwX,g+rX,o+rX /opt/thunderid
 
 # Switch to thunder user for security
 USER 10001
@@ -57,4 +57,4 @@ EXPOSE 8090
 RUN pwd
 
 # Use the Choreo startup script
-CMD ["start.sh"]
+CMD ["/opt/thunderid/start.sh"]
